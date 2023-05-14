@@ -3,7 +3,9 @@ TARGET = $(PROJECT)
 
 # Environment
 FB = fbc
- 
+
+# Utils flags
+#CFLAGS = -Wall -U_FORTIFY_SOURCE
 #FBFLAGS =
 
 # Application pieces
