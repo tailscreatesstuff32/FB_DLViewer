@@ -12,7 +12,6 @@ dim shared as Display ptr dpy
 dim shared as Window win
 
 dim shared as XVisualInfo ptr vi
-
 dim shared as Colormap cmap
 dim shared as XSetWindowAttributes swa
 dim shared as GLXContext cx 
@@ -20,12 +19,10 @@ dim shared as XEvent event
 
 dim shared as integer dummy 
 
+ 
 static shared scr as integer
 static shared root as display ptr
-
-
-
-dim shared  as GLint                   att(0 to ...) => { GLX_RGBA, GLX_DEPTH_SIZE, 16, GLX_DOUBLEBUFFER, None }
+ 
 
 
 
@@ -241,16 +238,11 @@ function XMain2() as integer
 				dim as byte       buffer(1)
 				kevent = cast(XKeyEvent ptr, @event) 
 				if((XLookupString(cast(XKeyEvent ptr,@event),@buffer(0),1,@keysym,NULL)  = 1) andalso  keysym  = cast(KeySym,XK_Escape)) then
-				 
 				zProgram.IsRunning = false
 				end if
-				
-				
-				
 				zProgram._Key(keysym and &HFF) = true
 		 
 			  case KeyRelease 
-		 
 				dim as KeySym     keysym
 				dim as byte       buffer(1)
 				XLookupString(cast(XKeyEvent ptr,@event),@buffer(0),1,@keysym,NULL) 
@@ -261,7 +253,6 @@ function XMain2() as integer
 				zProgram.MouseCenterX = event.xbutton.x 
 				zProgram.MouseCenterY = event.xbutton.y 
 				 
-
 			   case MotionNotify 
 				if (event.xmotion.state and Button1Mask)  then
 					zProgram.MousePosX = event.xbutton.x
@@ -269,7 +260,6 @@ function XMain2() as integer
 					ca_MouseMove(zProgram.MousePosX, zProgram.MousePosY)
 					ca_Orientation(zCamera.AngleX, zCamera.AngleY)
 				end if
-			 
 
 			case ConfigureNotify 
 				zProgram.WindowWidth = event.xconfigure.width
@@ -278,7 +268,7 @@ function XMain2() as integer
 			
 				 
 		end select
-loop
+	loop
 
 	 
 	return DoMainKbdInput()

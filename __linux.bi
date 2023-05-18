@@ -19,8 +19,10 @@
 #define KEY_CAMERA_DOWN				XK_s_
 #define KEY_CAMERA_LEFT				XK_a_
 #define KEY_CAMERA_RIGHT			XK_d_
-#define KEY_GUI_TOGGLEGRID			XK_F11 and &HFF
-#define KEY_GUI_TOGGLEHUD			XK_F12 and &HFF
+#define KEY_GUI_TOGGLEGRID			XK_g_ and &HFF
+'XK_F11 and &HFF
+#define KEY_GUI_TOGGLEHUD			XK_h_ and &HFF
+'XK_F12 and &HFF
 #define KEY_DLIST_NEXTLIST			XK_KP_Add and &HFF
 #define KEY_DLIST_PREVLIST			XK_KP_Subtract and &HFF
 

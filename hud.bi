@@ -1,3 +1,6 @@
+'FINISHED/////////////////////////
+
+
 type __zHUD 
 	as ubyte ptr _Image
 	as GLuint TexID 
@@ -17,4 +20,4 @@ declare sub hud_Print2 cdecl (X as GLint, Y as GLint,W  as integer, H as integer
 
 
 
-declare sub hudMenu_Init()
+

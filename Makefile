@@ -9,10 +9,10 @@ FB = fbc
 #FBFLAGS =
 
 # Application pieces
-PIECES	= main.bas confuncs.bas oz.bas __linux.bas dlist.bas draw.bas hud.bas camera.bas
-
-
- 
+PIECES	= main.bas confuncs.bas oz.bas dlist.bas draw.bas hud.bas hud_menu.bas camera.bas mouse.bas
+PIECES += __linux.bas 
+  
+  
 # Make
 all: $(PIECES)
 	$(FB) $(PIECES) -x $(TARGET) 

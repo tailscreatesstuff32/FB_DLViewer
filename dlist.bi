@@ -1,1 +1,5 @@
 declare sub dl_ViewerInit(UCode as integer)
+declare sub dl_LoadFileToSegment(Filename as zstring ptr,Segment as ubyte)
+declare sub dl_LoadRAMDump(Filename as zstring ptr)
+declare sub dl_SetUCodeByName(UCodeName as zstring ptr)
+declare sub dl_FindDLists(Segment as ubyte)

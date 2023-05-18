@@ -114,7 +114,7 @@ end sub
 
 sub gl_DrawHUD()
 
-if(zOptions.EnableHUD = false) then return
+if(zOptions.EnableHUD = 0) then return
  	gl_SetupScene2D(zProgram.WindowWidth, zProgram.WindowHeight)
  	
  	
@@ -340,6 +340,36 @@ sub gl_SetupScene3D2(W as integer,H as integer)
  
  
 end sub
+
+
+sub gl_CreateSceneDLists()
+
+dbgprintf(0, MSK_COLORTYPE_OKAY, "Now executing Display Lists... please wait.")
+
+dim as integer i = 0
+
+
+do while i < zProgram.Dlistcount
+	'if(RDP_CheckAddressValidity(zProgram.DListAddr[i])) then
+			'// delete list
+			if(glIsList(zProgram.DListGL(i))) then glDeleteLists(zProgram.DListGL(i), 1)
+			'// generate list
+			zProgram.DListGL(i) = glGenLists(1)
+			'// fill list
+			glNewList(zProgram.DListGL(i), GL_COMPILE_AND_EXECUTE)
+				'RDP_SetCycleType(1)
+				'RDP_ParseDisplayList(zProgram.DListAddr(i), true)
+			glEndList()
+			 glDeleteLists(zProgram.DListGL(i), 1)
+		'end if
+i+=1
+
+loop
+
+
+
+end sub
+
 
 
 

@@ -1,6 +1,11 @@
  
 
-#inclib "png"
+'#inclib "png"
+#inclib "badRDP"
+
+'#inclib "GLEW"
+
+
 
 
 #include "globals.bi"
@@ -16,7 +21,8 @@ dim shared as __zOptions zOptions
 dim shared as __zCamera zCamera
 'dim shared as __zHUD zHUD
 
- 
+dim shared as __RAM RAM(MAX_SEGMENTS) 
+dim shared as __RDRAM RDRAM 
 
 
 #ifndef FILESEP
@@ -106,7 +112,7 @@ sub dbgprintf cdecl (Level as integer , _Type as integer,  _Format as zstring pt
 	end if
 end sub
 function  DoMainKbdInput() as integer
-	' if(RDRAM.IsSet == false) {
+	 if(RDRAM.IsSet = false) then
 
 		if(zProgram._Key(KEY_CAMERA_UP)) then ca_Movement(false, zCamera.CamSpeed)
 		if(zProgram._Key(KEY_CAMERA_DOWN)) then ca_Movement(false, -zCamera.CamSpeed)
@@ -115,14 +121,20 @@ function  DoMainKbdInput() as integer
 		
 		
 		
-	'end if
+	end if
 
 	if(zProgram._Key(KEY_GUI_TOGGLEHUD)) then
+	'beep
+	dbgprintf(0, MSK_COLORTYPE_INFO, !"%i\n",KEY_GUI_TOGGLEHUD) 
+	
+	
+	
 		zOptions.EnableHUD xor= 1 
 		zProgram._Key(KEY_GUI_TOGGLEHUD) = false 
 	end if
 
 	if(zProgram._Key(KEY_GUI_TOGGLEGRID))  then
+	dbgprintf(0, MSK_COLORTYPE_INFO, !"%i\n",KEY_GUI_TOGGLEGRID)
 		zOptions.EnableGrid xor= 1 
 		zProgram._Key(KEY_GUI_TOGGLEGRID) = false 
 	end if
@@ -242,10 +254,10 @@ function main(argc as integer, argv as zstring ptr ptr) as integer
 	
 	
 #ifdef __FB_DEBUG__
-	sprintf(zProgram.Title,APPTITLE " " VERSION " (build " __DATE__ " "   __TIME__  ")" )
+	sprintf(zProgram.Title,APPTITLE " " _VERSION " (build " __DATE__ " "   __TIME__  ")" )
 	
 #else
-	sprintf(zProgram.Title,APPTITLE " " VERSION " (build " __DATE__ " "   __TIME__  ")" " / Debug" ")" )
+	sprintf(zProgram.Title,APPTITLE " " _VERSION " (build " __DATE__ " "   __TIME__  ")" " / Debug" ")" )
  
 #endif
  
@@ -309,8 +321,8 @@ function main(argc as integer, argv as zstring ptr ptr) as integer
  
   
  		
- 	'RDP_SetupOpenGL();
-	'RDP_SetRendererOptions(BRDP_TEXTURES | BRDP_COMBINER | BRDP_TEXCRC/* | BRDP_WIREFRAME*/);	
+ 	RDP_SetupOpenGL()
+	'RDP_SetRendererOptions(BRDP_TEXTURES or BRDP_COMBINER or BRDP_TEXCRC /' or BRDP_WIREFRAME'/ )	
  	dl_ViewerInit(F3DEX2)
  	
  	gl_SetupScene3D(zProgram.WindowWidth, zProgram.WindowHeight)
@@ -321,8 +333,8 @@ function main(argc as integer, argv as zstring ptr ptr) as integer
 	zProgram.DListCount = -1
 	zProgram.DListSel = -1
 
-	zOptions.EnableHUD = true
-	zOptions.EnableGrid = true
+	zOptions.EnableHUD = _true
+	zOptions.EnableGrid = _true
 	
 	
 	ca_Reset()

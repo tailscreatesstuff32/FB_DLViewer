@@ -1,3 +1,5 @@
+'FINISHED/////////////////////////////////////
+
 declare sub cn_InitCommands()
 declare sub cn_Cmd_LoadScript(_Ptr as ubyte ptr)
 declare sub cn_Cmd_SetUCode(_Ptr as ubyte ptr)

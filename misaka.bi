@@ -1,13 +1,6 @@
-'COMPLETE////////////////////////////////
+'FINISHED/////////////////////////////////////
 
-#define APPTITLE		"FB_DLViewer"
-#define VERSION			"v0.0"
-
-
-#define WINDOW_WIDTH	640
-#define WINDOW_HEIGHT	480
-
-
+ 
  type __MSK_Return
 	as integer Handle 
 	as byte s8 
@@ -39,6 +32,8 @@ type __MSK_UI_Dialog
 	as __MSK_UI_Object _Object(512)
 end type
 
+
+#define ArraySize_bytes(a) (ubound(a)+1) * sizeof(a)
 
 extern "C"
 

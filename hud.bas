@@ -1,3 +1,7 @@
+'FINISHED/////////////////////////
+
+
+
 #include "globals.bi"
 #include "font.bi"
 
@@ -241,11 +245,6 @@ sub hud_BuildFont()
 		glEndList()
 	next
 	
-end sub
-
-
-sub hudMenu_Init()
-
 end sub
 
 

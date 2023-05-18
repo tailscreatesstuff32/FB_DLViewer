@@ -1,3 +1,14 @@
+
+#define APPTITLE		"FB_DLViewer"
+#define _VERSION		"v0.0"
+
+
+#define WINDOW_WIDTH	640
+#define WINDOW_HEIGHT	480
+ 
+ 
+ 
+ 
  
 #ifndef EXIT_FAILURE
 	#define EXIT_FAILURE 1
@@ -12,7 +23,7 @@
 
 'enum { true = 1, false = 0 };
 
-enum _bool
+enum bool
 _true = 1
 _false = 0 
 end enum
@@ -23,15 +34,9 @@ end enum
 ' #define _false 0 
 
 
-#define ArraySize(x)	ubound(x)
 
 
-#ifndef min
-#define min(a, b)			iif(a < b,a,b) 
-#endif
-
-#define GetPaddingSize(Filesize, Factor) _
-	(((Filesize / Factor) + 1) * Factor) - Filesize
+ 
 
 '// ----------------------------------------
 
@@ -66,42 +71,48 @@ end type
 #include "curses/ncurses.bi"
 
 #include "misaka.bi"
+#include "badrdp.bi"
 
+extern "C"
+declare sub RDP_SetupOpenGL()
+end extern 
 #include "oz.bi"
 #include "dlist.bi"
 #include "draw.bi"
 #include "hud.bi"
+#include "hud_menu.bi"
+#include "mouse.bi"
 #include "camera.bi"
 #include "confunc.bi"
 
 '////////////////////////////////////////////////////////////////
 '// ----------------------------------------
 
-/' #define Read16(Buffer, Offset) \
-	(Buffer[Offset] << 8) | Buffer[(Offset) + 1]
+  #define Read16(Buffer, Offset) _
+	(Buffer[Offset] shl 8) or Buffer[(Offset) + 1]
 
-#define Read32(Buffer, Offset) \
-	(Buffer[Offset] << 24) | (Buffer[(Offset) + 1] << 16) | (Buffer[(Offset) + 2] << 8) | Buffer[(Offset) + 3]
+#define Read32(Buffer, Offset) _
+	(Buffer[Offset] shl 24) or (Buffer[(Offset) + 1] shl 16) or (Buffer[(Offset) + 2] shl 8) or Buffer[(Offset) + 3]
 
-#define Write16(Buffer, Offset, Value) \
-	Buffer[Offset] = (Value & 0xFF00) >> 8; \
-	Buffer[Offset + 1] = (Value & 0x00FF);
+#define Write16(Buffer, Offset, Value)  _
+	Buffer[Offset] = (Value and &HFF00) shr 8 _
+	Buffer[Offset + 1] = (Value and &H00FF)
 
-#define Write32(Buffer, Offset, Value) \
-	Buffer[Offset] = (Value & 0xFF000000) >> 24; \
-	Buffer[Offset + 1] = (Value & 0x00FF0000) >> 16; \
-	Buffer[Offset + 2] = (Value & 0x0000FF00) >> 8; \
-	Buffer[Offset + 3] = (Value & 0x000000FF);
+#define Write32(Buffer, Offset, Value)  _
+	Buffer[Offset] = (Value1 and &HFF000000) shr 24 _
+	Buffer[Offset + 1] = (Value1 and &H00FF0000) shr 16 _
+	Buffer[Offset + 2] = (Value1 and &H0000FF00) shr 8 _
+	Buffer[Offset + 3] = (Value1 and &H000000FF) _
 
-#define Write64(Buffer, Offset, Value1, Value2) \
-	Buffer[Offset] = (Value1 & 0xFF000000) >> 24; \
-	Buffer[Offset + 1] = (Value1 & 0x00FF0000) >> 16; \
-	Buffer[Offset + 2] = (Value1 & 0x0000FF00) >> 8; \
-	Buffer[Offset + 3] = (Value1 & 0x000000FF); \
-	Buffer[Offset + 4] = (Value2 & 0xFF000000) >> 24; \
-	Buffer[Offset + 5] = (Value2 & 0x00FF0000) >> 16; \
-	Buffer[Offset + 6] = (Value2 & 0x0000FF00) >> 8; \
-	Buffer[Offset + 7] = (Value2 & 0x000000FF); '/
+#define Write64(Buffer, Offset, Value1, Value2) _ 
+	Buffer[Offset] = (Value1 and &HFF000000) shr 24 _
+	Buffer[Offset + 1] = (Value1 and &H00FF0000) shr 16 _
+	Buffer[Offset + 2] = (Value1 and &H0000FF00) shr 8 _
+	Buffer[Offset + 3] = (Value1 and &H000000FF) _
+	Buffer[Offset + 4] = (Value2 and &HFF000000) shr 24 _
+	Buffer[Offset + 5] = (Value2 and &H00FF0000) shr 16 _
+	Buffer[Offset + 6] = (Value2 and &H0000FF00) shr 8 _
+	Buffer[Offset + 7] = (Value2 and &H000000FF)
 
  
  
@@ -113,6 +124,19 @@ end type
  
  #define _SHIFTL( v, s, w ) _
     ((cast(ulong,v) and ((&H01 shl w) - 1)) shl s)
+    
+ #define ArraySize(x)	ubound(x)  + 1
+ 
+ #ifndef min
+#define min(a, b)				iif(a < b, a, b)
+#endif
+
+
+
+#define GetPaddingSize(Filesize, Factor) _
+	(((Filesize / Factor) + 1) * Factor) - Filesize
+
+ 
  
 
 '// ----------------------------------------
@@ -123,8 +147,8 @@ end type
 
 type  __zOptions 
 	as integer DebugLevel 
-	as boolean EnableHUD 
-	as boolean EnableGrid 
+	as bool EnableHUD 
+	as bool EnableGrid 
 end type 
 
 type __zCamera 
@@ -138,7 +162,9 @@ type __zCamera
 	as double LZ 
 	as double CamSpeed 
 end type 
+
 'double  LastTime 
+
  type __zProgram
 	as boolean IsRunning
 	as boolean _key(256)
@@ -206,7 +232,7 @@ end enum
 
 extern as UcodeIDs _UcodeIDs
 
-extern as zstring ptr UCodeName(2)
+extern as zstring ptr UCodeNames(2)
 
 declare function DoMainKbdInput() as integer
 declare  function  ScaleRange( in as double , oldMin as double ,  oldMax as double, newMin  as double, newMax  as double) as double

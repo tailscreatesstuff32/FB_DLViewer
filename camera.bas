@@ -1,3 +1,6 @@
+'FINISHED/////////////////////////////////////
+
+
 #include "globals.bi"
 
  sub ca_Reset()
