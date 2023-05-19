@@ -18,7 +18,7 @@ all: $(PIECES)
 	$(FB) $(PIECES) -x $(TARGET) 
 
 # Cleanup
-#clean:
-	#-vrf $(TARGET) *.o dump extr log.txt
+clean:
+	rm -vrf $(TARGET) *.o *.a dump extr log.txt
 	
 
