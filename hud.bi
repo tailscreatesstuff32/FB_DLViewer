@@ -16,7 +16,7 @@ declare function hud_LoadFontBuffer(buffer as ubyte ptr) as boolean
 declare sub hud_BuildFont()
 declare sub hud_KillFont()
 declare sub hud_Print cdecl (X as GLint, Y as GLint,W  as integer, H as integer,scale as integer,Vis as double,  _String as zstring ptr, ...)
-declare sub hud_Print2 cdecl (X as GLint, Y as GLint,W  as integer, H as integer,scale as integer,Vis as double,  _String as zstring ptr, ...)
+
 
 
 
