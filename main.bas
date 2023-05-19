@@ -114,17 +114,11 @@ function  DoMainKbdInput() as integer
 	end if
 
 	if(zProgram._Key(KEY_GUI_TOGGLEHUD)) then
-	'beep
-	dbgprintf(0, MSK_COLORTYPE_INFO, !"%i\n",KEY_GUI_TOGGLEHUD) 
-	
-	
-	
 		zOptions.EnableHUD xor= 1 
 		zProgram._Key(KEY_GUI_TOGGLEHUD) = false 
 	end if
 
 	if(zProgram._Key(KEY_GUI_TOGGLEGRID))  then
-	dbgprintf(0, MSK_COLORTYPE_INFO, !"%i\n",KEY_GUI_TOGGLEGRID)
 		zOptions.EnableGrid xor= 1 
 		zProgram._Key(KEY_GUI_TOGGLEGRID) = false 
 	end if
