@@ -1,20 +1,14 @@
- 
+'FINISHED/////////////////////////
 
-'#inclib "png"
-#inclib "badRDP"
 
+
+#inclib "png"
+'#inclib "badRDP"
+#inclib "FB_BadRDP"
 '#inclib "GLEW"
-
-
-
 
 #include "globals.bi"
  
-
-
-
-
-
 
 dim shared as __zProgram zProgram
 dim shared as __zOptions zOptions
@@ -23,11 +17,6 @@ dim shared as __zCamera zCamera
 
 dim shared as __RAM RAM(MAX_SEGMENTS) 
 dim shared as __RDRAM RDRAM 
-
-
-#ifndef FILESEP
-#define FILESEP !"/"
-#endif
 
 declare sub die(code as integer)
 
@@ -111,6 +100,7 @@ sub dbgprintf cdecl (Level as integer , _Type as integer,  _Format as zstring pt
 	 
 	end if
 end sub
+
 function  DoMainKbdInput() as integer
 	 if(RDRAM.IsSet = false) then
 
@@ -157,96 +147,6 @@ function  DoMainKbdInput() as integer
 return EXIT_SUCCESS
 
 end function
-
-
-
-'///////////////////////////////////////////////////////////////////////////////////
-
-
-#include "GL/glu.bi"
-
-'dim shared  as Display ptr dpy
-dim shared  as Window   root
-dim shared  as GLint                   att(0 to ...) => { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None }
-'dim shared  as XVisualInfo ptr         vi
-'dim shared  as Colormap                cmap
-'dim shared  as XSetWindowAttributes    swa
-'dim shared  as Window                  win
-dim shared  as GLXContext              glc
-dim shared  as XWindowAttributes       gwa
-dim shared  as XEvent                  xev
-
-
-
- 
-
-
-function main2(argc as integer, argv as zstring ptr ptr) as integer
-
- dpy = XOpenDisplay(NULL)
- 
- if(dpy = NULL) then
- 	printf(!"\n\tcannot connect to X server\n\n")
-        end 0
-end if
-        
- root = DefaultRootWindow(dpy)
-
- vi = glXChooseVisual(dpy, 0, @att(0))
-
- if(vi = NULL) then
-	printf(!"\n\tno appropriate visual found\n\n")
-        end 0
-  
- else  
-	printf(!"\n\tvisual %p selected\n", cast(any ptr,vi->visualid)) ' /* %p creates hexadecimal output like in glxinfo */
-end if
-
-
- cmap = XCreateColormap(dpy, root, vi->visual, AllocNone)
-
- swa.colormap = cmap
- swa.event_mask = ExposureMask or KeyPressMask
- 
- win = XCreateWindow(dpy, root, 0, 0, 600, 600, 0, vi->depth, InputOutput, vi->visual, CWColormap or CWEventMask, @swa)
-
- XMapWindow(dpy, win)
- XStoreName(dpy, win, "VERY SIMPLE APPLICATION")
- 
- glc = glXCreateContext(dpy, vi, NULL, GL_TRUE)
- glXMakeCurrent(dpy, win, glc)
- 
- glEnable(GL_DEPTH_TEST)
- 
- do while 1
- 	XNextEvent(dpy, @xev)
-        
-        if(xev.type = Expose) then
-        	XGetWindowAttributes(dpy, win, @gwa)
-                glViewport(0, 0, gwa.width, gwa.height)
-        	DrawAQuad()
-                glXSwapBuffers(dpy, win)
-    
-                
-	elseif (xev.type = KeyPress)  then
-        	glXMakeCurrent(dpy, None, NULL)
- 		glXDestroyContext(dpy, glc)
- 		XDestroyWindow(dpy, win)
- 		XCloseDisplay(dpy)
- 		end 0
-        end if
-      
-loop 
-return 0
-
-
- end function
-
-'//////////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 function main(argc as integer, argv as zstring ptr ptr) as integer
 
@@ -322,7 +222,7 @@ function main(argc as integer, argv as zstring ptr ptr) as integer
   
  		
  	RDP_SetupOpenGL()
-	'RDP_SetRendererOptions(BRDP_TEXTURES or BRDP_COMBINER or BRDP_TEXCRC /' or BRDP_WIREFRAME'/ )	
+	RDP_SetRendererOptions(BRDP_TEXTURES or BRDP_COMBINER or BRDP_TEXCRC /' or BRDP_WIREFRAME'/ )	
  	dl_ViewerInit(F3DEX2)
  	
  	gl_SetupScene3D(zProgram.WindowWidth, zProgram.WindowHeight)
@@ -414,61 +314,6 @@ function main(argc as integer, argv as zstring ptr ptr) as integer
  
  
 end function
-
-
-
-
-
-function main3(argc as integer, argv as zstring ptr ptr) as integer
- 
- 	
- 	if oz_InitProgram(zProgram.Title, zProgram.WindowWidth, zProgram.WindowHeight)  then 
- 	   die(EXIT_FAILURE)
-  
-  
-
- 	end if
- 	
-      
-  
-  
-
- 	zProgram.IsRunning = true
- 	do while zProgram.IsRunning
- 	gl_DrawScene2
- 		   glEnable(GL_DEPTH_TEST)
-		gl_FinishScene
-	
-	loop
-
- 
- 	
- 	
- 	if(oz_ExitProgram()) then die(EXIT_FAILURE)
- 
-	  die(EXIT_SUCCESS)
- 
- 
-
-	return EXIT_FAILURE
- 	
-	'do while (XNextEvent(dpy, @event) = 0)
-	 
-	
-	'loop
- 
-end function
-
-
-
-
-
-
-
-
-
-
-
 
 
 function  ScaleRange( in as double , oldMin as double ,  oldMax as double, newMin  as double, newMax  as double) as double

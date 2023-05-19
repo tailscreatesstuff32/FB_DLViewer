@@ -2,29 +2,6 @@
 #include "GL/glu.bi"
 #define GRID_SIZE	10.0f
 
-sub DrawAQuad() 
-' glClearColor(1.0, 1.0, 1.0, 1.0)
-'glClearColor(0.2f, 0.5f, 0.7f, 1.0f)
-' glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-
- glMatrixMode(GL_PROJECTION)
- glLoadIdentity()
- glOrtho(-1, 1, -1, 1, 1, 20)
-
- glMatrixMode(GL_MODELVIEW)
- glLoadIdentity()
- gluLookAt(0, 0, 10, 0, 0, 0, 0, 1, 0)
-
- glBegin(GL_QUADS)
-  glColor3f(1, 0, 0): glVertex3f(-0.75, -0.75, 0)
-  glColor3f(0, 1, 0): glVertex3f( 0.75, -0.75, 0)
-  glColor3f(0, 0, 1): glVertex3f( 0.75,  0.75, 0)
-  glColor3f(1, 1, 0): glVertex3f(-0.75,  0.75, 0)
- glEnd()
-end sub
- 
-
-
 
 sub gl_LookAt( p_EyeX as const GLdouble, p_EyeY  as const GLdouble, p_EyeZ as const GLdouble,p_CenterX as  const GLdouble ,  p_CenterY as const GLdouble, p_CenterZ as const GLdouble)
 	dim as GLdouble l_X = p_EyeX - p_CenterX
@@ -111,113 +88,48 @@ sub gl_SetupScene2D(W as integer,H as integer)
 end sub
 
 
-
+'NOT COMPLETE///////////////
 sub gl_DrawHUD()
 
-if(zOptions.EnableHUD = 0) then return
+	if(zOptions.EnableHUD = 0) then return
  	gl_SetupScene2D(zProgram.WindowWidth, zProgram.WindowHeight)
- 	
- 	
- 	
- 	hud_Print2(0, -1, zProgram.WindowWidth, -1, 1, 1.0f,!"Display List: all")
-
-hud_Print2(130, -1, 0, -1, 1, 1.0f,"Scale: %4f",zProgram.ScaleFactor)
-
-'zProgram.LastFPS = 60
-hud_Print2(zProgram.WindowWidth - 45, -1, 0, -1, 1, 1.0f,"FPS: %i",zProgram.LastFPS)			
-			
- 	
- 	
  
+ 	if(RDRAM.IsSet = true) then
+		hud_Print( _
+			0, -1, zProgram.WindowWidth, -1, 1, 1.0f, _
+			"Display List: ignored")
+         elseif(zProgram.DListSel = -1)  then
+		hud_Print( _
+			0, -1, zProgram.WindowWidth, -1, 1, 1.0f, _
+			"Display List: all")
+	else
+		hud_Print( _
+			0, -1, zProgram.WindowWidth, -1, 1, 1.0f, _
+			"Display List: %08X", _
+			zProgram.DListAddr(zProgram.DListSel))
+	end if
 
-end sub
-
-sub gl_DrawHUD2()
-
-
-	glViewport(0, 0, 640, 480)
-
-	glMatrixMode(GL_PROJECTION)
-	glLoadIdentity()
-	glOrtho(0, 640, 480, 0, -1.0f, 1.0f)
-
-	glMatrixMode(GL_MODELVIEW)
-	glLoadIdentity()
+	if(RDRAM.IsSet = false) then
+		hud_Print( _
+			130, -1, 0, -1, 1, 1.0f, _
+			"Scale: %4f", _
+			zProgram.ScaleFactor)
+	else
+		hud_Print( _
+			130, -1, 0, -1, 1, 1.0f, _
+			"Scale: ignored")
+	end if
+/'
+	hud_Print( _
+		230, -1, 0, -1, 1, 1.0f, _
+		"%4f", _
+		zCamera.CamSpeed)
+'/
+	hud_Print( _
+		zProgram.WindowWidth - 45, -1, 0, -1, 1, 1.0f, _
+		"FPS: %i", _
+		zProgram.LastFPS)	
  
-	glDisable(GL_DEPTH_TEST)
-	glDisable(GL_CULL_FACE)
-
-	glDisable(GL_LIGHTING)
- 	glDisable(GL_NORMALIZE)
-
-
-glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-	'if( zOptions.EnableHUD = 0 ) then return 
-	
-
- 
- 
-	'gl_SetupScene2D(zProgram.WindowWidth, zProgram.WindowHeight)
-	'glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
- 
-
- 
-	hud_Print( zProgram.WindowWidth - 45, -1, 0, -1, 1, 1.0f, "FPS: %i", zProgram.LastFPS)
-	
-	
-	
-	
-	
-	
-	/'if(RDRAM.IsSet == true) {
-		hud_Print(
-			0, -1, zProgram.WindowWidth, -1, 1, 1.0f,
-			"Display List: ignored");
-	} else if(zProgram.DListSel == -1) {
-		hud_Print(
-			0, -1, zProgram.WindowWidth, -1, 1, 1.0f,
-			"Display List: all");
-	} else {
-		hud_Print(
-			0, -1, zProgram.WindowWidth, -1, 1, 1.0f,
-			"Display List: %08X",
-			zProgram.DListAddr[zProgram.DListSel]);
-	}
-
-	if(RDRAM.IsSet == false) {
-		hud_Print(
-			130, -1, 0, -1, 1, 1.0f,
-			"Scale: %4f",
-			zProgram.ScaleFactor);
-	} else {
-		hud_Print(
-			130, -1, 0, -1, 1, 1.0f,
-			"Scale: ignored");
-	} '/
-/' /*
-	hud_Print(
-		230, -1, 0, -1, 1, 1.0f,
-		"%4f",
-		zCamera.CamSpeed);
-*/ '/
 
 end sub
 
@@ -238,9 +150,9 @@ sub gl_DrawScene()
 	gl_LookAt(zCamera.X, zCamera.Y, zCamera.Z, zCamera.X + zCamera.LX, zCamera.Y + zCamera.LY, zCamera.Z + zCamera.LZ)
 
 	 if(zOptions.EnableGrid) then
-	 	'if(RDP_OpenGL_ExtFragmentProgram()) glDisable(GL_FRAGMENT_PROGRAM_ARB);
+	 	 if(RDP_OpenGL_ExtFragmentProgram()) then glDisable(GL_FRAGMENT_PROGRAM_ARB)
 	 	glCallList(zProgram.GLGrid)
-	   'DrawAQuad() 
+ 
 	end if
 	
 	
@@ -257,7 +169,7 @@ sub gl_DrawScene()
 		 	if glIsList(zProgram.DListGL(i)) then glCallList(zProgram.DListGL(i)) 
 			
 			'
-		'//if(RDP_CheckAddressValidity(zProgram.DListAddr[i])) RDP_ParseDisplayList(zProgram.DListAddr[i], true);
+		 if(RDP_CheckAddressValidity(zProgram.DListAddr(i))) then RDP_ParseDisplayList(zProgram.DListAddr(i), true)
 		loop
 		
 		
@@ -268,8 +180,9 @@ sub gl_DrawScene()
 	  else  
 		if glIsList(zProgram.DListGL(zProgram.DListSel)) then   glCallList(zProgram.DListGL(zProgram.DListSel))
 		
-	/'	if(RDP_CheckAddressValidity(zProgram.DListAddr[zProgram.DListSel]))
-			RDP_ParseDisplayList(zProgram.DListAddr[zProgram.DListSel], true);  '/
+		/' if(RDP_CheckAddressValidity(zProgram.DListAddr(zProgram.DListSel))) then
+			RDP_ParseDisplayList(zProgram.DListAddr(zProgram.DListSel), true) 
+		end if '/
 	end if
 	
 
@@ -281,33 +194,6 @@ sub gl_DrawScene()
 
 end sub
 
-
-sub gl_DrawScene2()
-DrawAQuad
-
-
-	glClearColor(0.2f, 0.5f, 0.7f, 1.0f)
-	glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-
-       
-
-
-	 
-	
-
-    
-
-
-
-
-
-
-end sub
-
-
-
-
-
 sub gl_SetupScene3D(W as integer,H as integer)
  
 	dim as double TempMatrix(4,4)
@@ -318,11 +204,11 @@ sub gl_SetupScene3D(W as integer,H as integer)
 	glLoadIdentity()
 	gl_Perspective(60.0f, cast(GLfloat,W) / cast(GLfloat,H), 0.001f, 10000.0f)
 	glGetFloatv(GL_PROJECTION_MATRIX, @TempMatrix(0,0))
-	'RDP_Matrix_ProjectionLoad(TempMatrix);
+	RDP_Matrix_ProjectionLoad(@TempMatrix(0,0))
 	glMatrixMode(GL_MODELVIEW)
 	glLoadIdentity()
 	glGetFloatv(GL_MODELVIEW_MATRIX, @TempMatrix(0,0))
-	'RDP_Matrix_ModelviewLoad(TempMatrix)
+	RDP_Matrix_ModelviewLoad(@TempMatrix(0,0))
 
 	glEnable(GL_DEPTH_TEST)
 end sub
@@ -330,17 +216,7 @@ end sub
 
 
 
-
-sub gl_SetupScene3D2(W as integer,H as integer)
- 'glViewport(0, 0, W, H)
- ' glEnable(GL_DEPTH_TEST)
  
- 
- 
- 
- 
-end sub
-
 
 sub gl_CreateSceneDLists()
 
@@ -350,18 +226,18 @@ dim as integer i = 0
 
 
 do while i < zProgram.Dlistcount
-	'if(RDP_CheckAddressValidity(zProgram.DListAddr[i])) then
+	if(RDP_CheckAddressValidity(zProgram.DListAddr(i))) then
 			'// delete list
 			if(glIsList(zProgram.DListGL(i))) then glDeleteLists(zProgram.DListGL(i), 1)
 			'// generate list
 			zProgram.DListGL(i) = glGenLists(1)
 			'// fill list
 			glNewList(zProgram.DListGL(i), GL_COMPILE_AND_EXECUTE)
-				'RDP_SetCycleType(1)
-				'RDP_ParseDisplayList(zProgram.DListAddr(i), true)
+				RDP_SetCycleType(1)
+				RDP_ParseDisplayList(zProgram.DListAddr(i), true)
 			glEndList()
 			 glDeleteLists(zProgram.DListGL(i), 1)
-		'end if
+		end if
 i+=1
 
 loop

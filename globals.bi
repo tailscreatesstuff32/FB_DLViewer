@@ -73,9 +73,7 @@ end type
 #include "misaka.bi"
 #include "badrdp.bi"
 
-extern "C"
-declare sub RDP_SetupOpenGL()
-end extern 
+ 
 #include "oz.bi"
 #include "dlist.bi"
 #include "draw.bi"

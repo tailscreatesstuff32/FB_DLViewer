@@ -9,8 +9,7 @@ function oz_InitProgram(WWndTitle as zstring ptr, w as integer, h as integer) as
 	#ifdef FB_WIN32
 	return WinAPIInit(WndTitle, W, H)
 	#else
-	'return XInit(WWndTitle, W, H)
-	return XInit2(WWndTitle, W, H)
+	return XInit(WWndTitle, W, H)
 	#endif
 
 

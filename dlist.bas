@@ -6,12 +6,12 @@ dim shared as ubyte Cmd_TEXTURE = 0
 
 sub dl_ViewerInit(UCode as integer)
 
-        'RDP_ClearStructures(true);
-	'RDP_ClearTextures();
+        RDP_ClearStructures(true)
+	RDP_ClearTextures()
 
 	if(cast(integer, zProgram.UCode) <> UCode) then 
 		zProgram.UCode = UCode
-		'RDP_InitParser(zProgram.UCode)
+		RDP_InitParser(zProgram.UCode)
 
 		select case (zProgram.UCode) 
 			case F3D
@@ -74,17 +74,17 @@ sub dl_LoadRAMDump(Filename as zstring ptr)
 	fread(TempRDRAM, 1, _Size, file)
 	fclose(file)
 
-	'RDP_LoadToRDRAM(TempRDRAM, Size);
+	RDP_LoadToRDRAM(TempRDRAM, _Size)
 
 	free(TempRDRAM)
 
 	dbgprintf(0, MSK_COLORTYPE_INFO, "Loaded %s to RDRAM.", Filename)
 
-/'	zProgram.DListSel = 0;
-	//zProgram.DListAddr[0] = 0x802E1AD0; //sin
-	//zProgram.DListAddr[0] = 0x8016E5A0; //eva
-	zProgram.DListAddr[0] = 0x8016A648; //oot
-	zProgram.DListCount = 0;'/
+ 	zProgram.DListSel = 0
+	'//zProgram.DListAddr[0] = 0x802E1AD0; //sin
+	'//zProgram.DListAddr[0] = 0x8016E5A0; //eva
+	zProgram.DListAddr(0) = &H8016A648  '//oot
+	zProgram.DListCount = 0 
 end sub
 
 
@@ -111,11 +111,11 @@ dim as FILE ptr file
 
 	dl_ViewerInit(zProgram.UCode)
 
-	'if(RDP_CheckAddressValidity(Segment << 24)) {
-	'	RDP_ClearSegment(Segment);
-	'}
+	if(RDP_CheckAddressValidity(Segment shl 24) = 0) then
+	 	RDP_ClearSegment(Segment)
+	end if
 
-	'RDP_LoadToSegment(Segment, Data, 0, Size);
+	RDP_LoadToSegment(Segment, _Data, 0, _Size)
 
 	free(_Data)
 
@@ -135,13 +135,13 @@ sub dl_FindDLists(Segment as ubyte)
 
 	do while 1
 		FullAddr = ((Segment shl 24) or i) 
-		'if(!RDP_CheckAddressValidity(FullAddr + 8)) break;
+		if(RDP_CheckAddressValidity(FullAddr + 8) = 0) then exit do
 
  
 		dim as uinteger W0 = Read32(RAM(Segment)._Data, i) 
 		dim as uinteger W1  = Read32(RAM(Segment)._Data, i + 4) 
 		 
-		if cast(integer,w0) = (Cmd_DL shl 24) and cast(integer, 0) <> 0 then 'andalso  (RDP_CheckAddressValidity(W1)))  then
+		if cast(integer,w0) = (Cmd_DL shl 24) and cast(integer, 0) <> 0 andalso  (RDP_CheckAddressValidity(W1))  then
 			zProgram.DListCount += 1
 			zProgram.DListAddr(zProgram.DListCount) = W1
 			dbgprintf(0, MSK_COLORTYPE_INFO, "Found Display List at address 0x%08X.", zProgram.DListAddr(zProgram.DListCount))
@@ -158,7 +158,7 @@ sub dl_FindDLists(Segment as ubyte)
 	    FullAddr = ((Segment shl 24) or i)
 	    
 			 
-		'	if(!RDP_CheckAddressValidity(FullAddr + 8)) break;
+		 	if(RDP_CheckAddressValidity(FullAddr + 8) = 0) then exit do
 
  
 			
@@ -172,7 +172,7 @@ sub dl_FindDLists(Segment as ubyte)
 				(W0 shr 8 = &HFA0000) orelse _
 				(W0 = &HFB000000) orelse _
 				(cast(integer,W0) shr 8 = (Cmd_TEXTURE shl 16)) orelse _
-				((W0 shr 24 = &HFD) andalso ((W0 and &H0000FFFF) = 0)) ) then 'andalso (RDP_CheckAddressValidity(W1)))) {
+				((W0 shr 24 = &HFD) andalso ((W0 and &H0000FFFF) = 0)) ) andalso (RDP_CheckAddressValidity(W1)) then
 				
 				 	if(zProgram.DListCount = -1)  then
 				 	zProgram.DListCount +=1

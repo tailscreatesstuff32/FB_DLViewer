@@ -27,7 +27,7 @@ static shared root as display ptr
 
 
 
-function XInit2(WndTitle as zstring ptr, _width as integer,_height as integer) as integer
+function XInit(WndTitle as zstring ptr, _width as integer,_height as integer) as integer
 	dpy = XOpenDisplay(NULL)
 
 
@@ -79,80 +79,7 @@ function XInit2(WndTitle as zstring ptr, _width as integer,_height as integer) a
         
 	 return EXIT_SUCCESS
 
-
-
-                      '   scr = DefaultScreen(dpy)
-	'root = RootWindow(dpy, scr)
-        
-        
-       ' win = XCreateSimpleWindow(dpy, root,500,500,_Width, _Height,15,BlackPixel(dpy,scr),WhitePixel(dpy,scr) )
-	
-    '  glXMakeCurrent(dpy, win, cx)
-
-       '  XMapWindow(dpy,win)
-
 end function
-
-
-
-
-
-
-function XInit(WndTitle as zstring ptr, _width as integer,_height as integer) as integer
- 
-
-
- dpy = XOpenDisplay(NULL)    
- root = DefaultRootWindow(dpy)
-  vi = glXChooseVisual(dpy,0, @dblbuf(0))
- cmap = XCreateColormap(dpy, root, vi->visual, AllocNone)
- swa.colormap = cmap
- swa.event_mask = ExposureMask or KeyPressMask
- 'win = XCreateWindow(dpy, root, 0, 0, 600, 600, 0, vi->depth, InputOutput, vi->visual, CWColormap or CWEventMask, @swa)
- 
- win = XCreateWindow(dpy, root, 0, 0, _width, _height, 0, vi->depth, InputOutput, vi->visual, CWColormap or CWEventMask, @swa)
- 
- 
- 
- XMapWindow(dpy, win)
- 
-cx = glXCreateContext(dpy, vi, NULL, GL_TRUE)
- glXMakeCurrent(dpy, win, cx)
- 
-	 return EXIT_SUCCESS
-end function
-
-/'function XInit(WndTitle as zstring ptr, _width as integer,_height as integer) as integer
- 
-
-
- dpy = XOpenDisplay(NULL)    
- root = DefaultRootWindow(dpy)
- vi = glXChooseVisual(dpy, 0, @att(0))
- cmap = XCreateColormap(dpy, root, vi->visual, AllocNone)
- swa.colormap = cmap
- swa.event_mask = ExposureMask or KeyPressMask
- 'win = XCreateWindow(dpy, root, 0, 0, 600, 600, 0, vi->depth, InputOutput, vi->visual, CWColormap or CWEventMask, @swa)
- 
- win = XCreateWindow(dpy, root, 0, 0, _width, _height, 0, vi->depth, InputOutput, vi->visual, CWColormap or CWEventMask, @swa)
- 
- 
- 
- XMapWindow(dpy, win)
- XStoreName(dpy, win, "VERY SIMPLE APPLICATION")
-cx = glXCreateContext(dpy, vi, NULL, GL_TRUE)
- glXMakeCurrent(dpy, win, cx)
- 
-	 return EXIT_SUCCESS
-end function '/
-
-
-
-
-
-
-
-
 
 function XMain() as integer
  
@@ -215,72 +142,6 @@ loop
  
 
 end function
-
-
-
-
-
-
-function XMain2() as integer
- 
- 
-	do while(XPending(dpy) > 0) 
-		XNextEvent(dpy, @event)
-		select case (event.type)  
-			case Expose 
-				XFlush(dpy) 
-			 
-		       case KeyPress 
-		       
-		       
-				dim as KeySym     keysym
-				dim as  XKeyEvent ptr kevent
-				dim as byte       buffer(1)
-				kevent = cast(XKeyEvent ptr, @event) 
-				if((XLookupString(cast(XKeyEvent ptr,@event),@buffer(0),1,@keysym,NULL)  = 1) andalso  keysym  = cast(KeySym,XK_Escape)) then
-				zProgram.IsRunning = false
-				end if
-				zProgram._Key(keysym and &HFF) = true
-		 
-			  case KeyRelease 
-				dim as KeySym     keysym
-				dim as byte       buffer(1)
-				XLookupString(cast(XKeyEvent ptr,@event),@buffer(0),1,@keysym,NULL) 
-				zProgram._Key(keysym and &HFF) = false
-				
-
-			 case ButtonPress 
-				zProgram.MouseCenterX = event.xbutton.x 
-				zProgram.MouseCenterY = event.xbutton.y 
-				 
-			   case MotionNotify 
-				if (event.xmotion.state and Button1Mask)  then
-					zProgram.MousePosX = event.xbutton.x
-					zProgram.MousePosY = event.xbutton.y
-					ca_MouseMove(zProgram.MousePosX, zProgram.MousePosY)
-					ca_Orientation(zCamera.AngleX, zCamera.AngleY)
-				end if
-
-			case ConfigureNotify 
-				zProgram.WindowWidth = event.xconfigure.width
-				zProgram.WindowHeight = event.xconfigure.height
-				gl_SetupScene3D(zProgram.WindowWidth, zProgram.WindowHeight)
-			
-				 
-		end select
-	loop
-
-	 
-	return DoMainKbdInput()
- 
-
-end function
-
-
- 
-	
-	
-	
 	
 function XExit() as integer
  

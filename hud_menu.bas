@@ -188,7 +188,7 @@ sub hudMenu_Render(Title as zstring ptr,X as integer , Y as integer, Menu as __z
 	loop
 	
 	'// print via HUD
-	hud_Print2(X, Y, -1, -1, 1, 1.0f, Message)
+	hud_Print(X, Y, -1, -1, 1, 1.0f, Message)
 	
 	
 

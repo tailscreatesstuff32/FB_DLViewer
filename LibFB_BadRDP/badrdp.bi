@@ -57,7 +57,7 @@ Declare Function RDP_GetRendererOptions() As UByte
 Declare Sub RDP_Matrix_ModelviewLoad(Matrix As Single Ptr)
 Declare Sub RDP_Matrix_ProjectionLoad(Matrix As Single Ptr)
 Declare Sub RDP_Matrix_ModelviewPush()
-Declare Sub RDP_SetCycleType(Type As Integer)
+Declare sub RDP_SetCycleType(_Type as uinteger)
 Declare Sub RDP_SetPrimColor(R As UByte, G As UByte, B As UByte, A As UByte)
 Declare Sub RDP_SetEnvColor(R As UByte, G As UByte, B As UByte, A As UByte)
 Declare Sub RDP_ToggleMatrixHack()

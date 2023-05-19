@@ -53,8 +53,8 @@ if(_Ptr = NULL) then
 		dim as integer i
 		 
 		
-		do while i < MAX_SEGMENTS: /'RDP_ClearSegment(i)'/ :i += 1:loop
-		'RDP_ClearRDRAM()
+		do while i < MAX_SEGMENTS: RDP_ClearSegment(i) :i += 1:loop
+		RDP_ClearRDRAM()
 		
 		' // clear DList addresses
 		memset(@zProgram.DListAddr(0), 0, ArraySize(zProgram.DListAddr))
@@ -62,8 +62,8 @@ if(_Ptr = NULL) then
 		zProgram.DListSel = -1
 
 		' // clear libbadRDP data
-		'RDP_ClearStructures(true)
-		'RDP_ClearTextures()
+		RDP_ClearStructures(true)
+		RDP_ClearTextures()
 
 		' // analyze command script
 		dim as zstring * MAX_PATH Temp, TempCmd
@@ -155,12 +155,12 @@ sub cn_Cmd_LoadFile(_Ptr as ubyte ptr)
 			strcpy(TempString, WorkingDir)
 			strcat(TempString, Filename)
 			 dbgprintf(0, MSK_COLORTYPE_ERROR, "0x%02X %s",Segment,Filename)
-			'dl_LoadFileToSegment(TempString, Segment)
+			dl_LoadFileToSegment(TempString, Segment)
 		 else 
 		 
 		 
 		 dbgprintf(0, MSK_COLORTYPE_ERROR, "0x%02X %s",Segment,Filename)
-			'dl_LoadFileToSegment(Filename, Segment)
+	         dl_LoadFileToSegment(Filename, Segment)
 		end if
 	end if
 
@@ -173,13 +173,13 @@ sub cn_Cmd_ClearSegment(_Ptr as ubyte ptr)
 		dim as int32_t Segment = -1
 		sscanf(cast(zstring ptr,_Ptr+1), "0x%02X", @Segment)
 
-		'if(!RDP_CheckAddressValidity((Segment << 24))) {
+		 if(RDP_CheckAddressValidity((Segment shl 24)) = 0) then
 			dbgprintf(0, MSK_COLORTYPE_ERROR, "- Error: Invalid segment specified!")
 			return
-		'}
+		end if
 
 		dbgprintf(0, MSK_COLORTYPE_INFO, "Cleared segment 0x%02X.", Segment)
-		'RDP_ClearSegment(Segment)
+		RDP_ClearSegment(Segment)
 	end if
 
 end sub
@@ -205,12 +205,12 @@ zOptions.EnableGrid = false
 			strcpy(TempString, WorkingDir)
 			strcat(TempString, Filename)
 			 dbgprintf(0, MSK_COLORTYPE_ERROR, "%s",TempString)
-			'dRAMDump(dl_LoaTempString)
+			 dl_LoadRAMDump(TempString)
 		 else 
 		 
 		 
 		 dbgprintf(0, MSK_COLORTYPE_ERROR, "%s",Filename)
-			'dl_LoadRAMDump(Filename)
+			dl_LoadRAMDump(Filename)
 		end if
 	end if
 
@@ -227,12 +227,12 @@ sub cn_Cmd_FindDLists(_Ptr as ubyte ptr)
 		dim as integer Segment = -1
 			sscanf(cast(zstring ptr,_Ptr+1), "0x%02X", @Segment)
 
-		'if(!RDP_CheckAddressValidity((Segment shl 24))) {
-			'dbgprintf(0, MSK_COLORTYPE_ERROR, "- Error: Invalid segment specified!")
-			'return
-		'}
+		 if(RDP_CheckAddressValidity((Segment shl 24)) = 0) then
+			 dbgprintf(0, MSK_COLORTYPE_ERROR, "- Error: Invalid segment specified!")
+			 return
+		 end if
 
-		'dl_FindDLists(Segment)
+		dl_FindDLists(Segment)
 		gl_CreateSceneDLists()
 	end if
 
@@ -245,10 +245,10 @@ sub cn_Cmd_AddDList(_Ptr as ubyte ptr)
 		dim as int32_t Address = -1
 		sscanf(cast(zstring ptr,_Ptr+1), "0x%08X", @Address)
 
-		'if(!RDP_CheckAddressValidity(Address)) {
+		if(RDP_CheckAddressValidity(Address) = 0) then
 			dbgprintf(0, MSK_COLORTYPE_ERROR, "- Error: Invalid address specified!")
 			return
-		'}
+		end if
 
 		dbgprintf(0, MSK_COLORTYPE_INFO, "Added Display List address 0x%08X.", Address)
 		zProgram.DListCount+=1

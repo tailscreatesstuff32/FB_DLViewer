@@ -11,7 +11,7 @@ FB = fbc
 # Application pieces
 PIECES	= main.bas confuncs.bas oz.bas dlist.bas draw.bas hud.bas hud_menu.bas camera.bas mouse.bas
 PIECES += __linux.bas 
-  
+#PIECES += __win32.bas  
   
 # Make
 all: $(PIECES)
