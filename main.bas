@@ -20,6 +20,9 @@ dim shared as __RDRAM RDRAM
 
 declare sub die(code as integer)
 
+extern "c"
+Declare Function strdup (ByVal source As const zString ptr) As  zString ptr
+end extern
 
 sub GetFileName(FullPath As zstring ptr, Target As zstring ptr)
  
@@ -114,11 +117,17 @@ function  DoMainKbdInput() as integer
 	end if
 
 	if(zProgram._Key(KEY_GUI_TOGGLEHUD)) then
+	'beep
+	dbgprintf(0, MSK_COLORTYPE_INFO, !"%i\n",KEY_GUI_TOGGLEHUD) 
+	
+	
+	
 		zOptions.EnableHUD xor= 1 
 		zProgram._Key(KEY_GUI_TOGGLEHUD) = false 
 	end if
 
 	if(zProgram._Key(KEY_GUI_TOGGLEGRID))  then
+	dbgprintf(0, MSK_COLORTYPE_INFO, !"%i\n",KEY_GUI_TOGGLEGRID)
 		zOptions.EnableGrid xor= 1 
 		zProgram._Key(KEY_GUI_TOGGLEGRID) = false 
 	end if
@@ -216,6 +225,13 @@ function main(argc as integer, argv as zstring ptr ptr) as integer
   
  		
  	RDP_SetupOpenGL()
+ 	
+ 	'MSK_ConsolePrint(MSK_COLORTYPE_ERROR,!"%s\n",strdup(glgetstring(GL_EXTENSIONS)))
+
+ 	
+ 	'sleep
+ 	
+ 	
 	RDP_SetRendererOptions(BRDP_TEXTURES or BRDP_COMBINER or BRDP_TEXCRC /' or BRDP_WIREFRAME'/ )	
  	dl_ViewerInit(F3DEX2)
  	

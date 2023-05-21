@@ -301,7 +301,7 @@ sub hud_Print cdecl (X as GLint,Y as  GLint,W as integer,H as integer,Scale as i
 		glScaled(Scale, Scale, Scale)
 		glTranslated(X, Y, 0)
 
-		if(RDP_OpenGL_ExtFragmentProgram()) then glDisable(GL_FRAGMENT_PROGRAM_ARB)		
+		'if(RDP_OpenGL_ExtFragmentProgram()) glDisable(GL_FRAGMENT_PROGRAM_ARB)		
 		 
 		 glDisable(GL_TEXTURE_GEN_S)
 		 glDisable(GL_TEXTURE_GEN_T)
