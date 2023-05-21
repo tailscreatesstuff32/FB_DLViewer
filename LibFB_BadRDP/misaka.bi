@@ -38,7 +38,7 @@ end type
 extern "C"
 
 '#inclib "MISAKA"
-#inclib "FB_MISAKA"
+'#inclib "FB_MISAKA"
 
 declare function MSK_Init(  _Apptitle as zstring ptr) as integer
 declare sub MSK_SetValidCharacters(Chars as Zstring ptr)
