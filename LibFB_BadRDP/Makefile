@@ -18,6 +18,6 @@ all: $(PIECES)
 	$(FB) $(FBFLAGS) $(PIECES) -x $(TARGET) 
 
 # Cleanup
-clean:
-	rm -vrf $(TARGET) *.o dump extr log.txt
+#clean:
+	#-vrf $(TARGET) *.o dump extr log.txt
 	
