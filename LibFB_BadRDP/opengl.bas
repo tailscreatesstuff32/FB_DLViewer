@@ -1,33 +1,11 @@
+'FINISHED////////////////////////////////////////////////////////////////////////////////////
+
 #include "globals.bi"
 #include "misaka.bi"
 
 #inclib "FB_MISAKA"
 
-#ifdef WIN32
-dim shared as PFNGLMULTITEXCOORD1FARBPROC			glMultiTexCoord1fARB
-dim shared as PFNGLMULTITEXCOORD2FARBPROC			glMultiTexCoord2fARB
-dim shared as PFNGLMULTITEXCOORD3FARBPROC			glMultiTexCoord3fARB
-dim shared as PFNGLMULTITEXCOORD4FARBPROC			glMultiTexCoord4fARB
-dim shared as PFNGLACTIVETEXTUREARBPROC				glActiveTextureARB
-dim shared as PFNGLCLIENTACTIVETEXTUREARBPROC			glClientActiveTextureARB
-#endif /' WIN32 '/
 
-dim shared as PFNGLGENPROGRAMSARBPROC				glGenProgramsARB
-dim shared as PFNGLBINDPROGRAMARBPROC				glBindProgramARB
-dim shared as PFNGLDELETEPROGRAMSARBPROC			glDeleteProgramsARB
-dim shared as PFNGLPROGRAMSTRINGARBPROC				glProgramStringARB
-dim shared as PFNGLPROGRAMENVPARAMETER4FARBPROC			glProgramEnvParameter4fARB
-dim shared as PFNGLPROGRAMLOCALPARAMETER4FARBPROC		glProgramLocalParameter4fARB
-
-dim shared as __System _System
-dim shared as __Matrix Matrix
-dim shared as __Palette _Palette(256)
-dim shared as  __Vertex Vertex(32)
-dim shared as __Texture Texture(2)
-dim shared as __FragmentCache FragmentCache(CACHE_FRAGMENT)
-dim shared as __TextureCache TextureCache(CACHE_TEXTURES)
-dim shared as __Gfx Gfx
-dim shared as __OpenGL OpenGL
 
 '////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -40,7 +18,8 @@ RDP_ResetOpenGL()
 end sub
 
 sub RDP_SetOpenGLDimensions(_Width As Integer, _Height As Integer)
-
+	_System.DrawWidth = _Width
+	_System.DrawHeight = _Height
 end sub
 
 sub RDP_ResetOpenGL()
@@ -50,8 +29,8 @@ glHint(GL_POINT_SMOOTH_HINT, GL_NICEST)
 
 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
-glClearColor(0.2, 0.5, 0.7, 1.0)
-glClearDepth(5.0)
+glClearColor(0.2f, 0.5f, 0.7f, 1.0f)
+glClearDepth(5.0f)
 
 glDepthFunc(GL_LEQUAL)
 glEnable(GL_DEPTH_TEST)
@@ -61,10 +40,10 @@ glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
 dim as integer i
 for i = 0 to 3
-    Gfx.LightAmbient(i) = 1.0
-    Gfx.LightDiffuse(i) = 1.0
-    Gfx.LightSpecular(i) = 1.0
-    Gfx.LightPosition(i) = 1.0
+    Gfx.LightAmbient(i) = 1.0f
+    Gfx.LightDiffuse(i) = 1.0f
+    Gfx.LightSpecular(i) = 1.0f
+    Gfx.LightPosition(i) = 1.0f
 next i
 
 glLightfv(GL_LIGHT0, GL_AMBIENT, @Gfx.LightAmbient(0))
@@ -196,13 +175,159 @@ if OpenGL.ExtSupported <> "" then MSK_ConsolePrint(1, !"%ssupported\n",OpenGL.Ex
 end sub
 
 sub RDP_ClearTextures()
+if(Gfx.GLTextureID(0)) then glDeleteTextures(Gfx.GLTextureCount, @Gfx.GLTextureID(0))
+	Gfx.GLTextureCount = 0
 
+	glGenTextures(CACHE_TEXTURES, @Gfx.GLTextureID(0))
 end sub
 
+
+
+
+
 sub RDP_UpdateGLStates()
+	if(Gfx.Update and CHANGED_GEOMETRYMODE) then
+		if(Gfx.GeometryMode and G_CULL_BOTH) then
+			glEnable(GL_CULL_FACE)
+
+			if(Gfx.GeometryMode and G_CULL_BACK) then
+				glCullFace(GL_BACK)
+			else
+				glCullFace(GL_FRONT)
+			end if
+		  else 
+			glDisable(GL_CULL_FACE)
+		end if
+		
+		
+		if((Gfx.GeometryMode and G_TEXTURE_GEN_LINEAR) andalso (Gfx.GeometryMode and G_LIGHTING) = 0 andalso (_System.Options and BRDP_DISABLESHADE)) then
+			glShadeModel(GL_FLAT)
+		  else 
+			glShadeModel(GL_SMOOTH)
+		end if
+
+		if(Gfx.GeometryMode and G_TEXTURE_GEN) then
+			glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP)
+			glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP)
+			glEnable(GL_TEXTURE_GEN_S)
+			glEnable(GL_TEXTURE_GEN_T)
+		 else
+			glDisable(GL_TEXTURE_GEN_S)
+			glDisable(GL_TEXTURE_GEN_T)
+		end if
+		
+		/'
+		if((Gfx.GeometryMode and G_SHADING_SMOOTH) orelse (Gfx.GeometryMode and G_TEXTURE_GEN_LINEAR) = 0) then
+			glShadeModel(GL_SMOOTH)
+		else
+			glShadeModel(GL_FLAT)
+		end if
+                '/
+                
+                if(Gfx.GeometryMode and G_LIGHTING andalso (_System.Options and BRDP_DISABLESHADE)) then
+			glEnable(GL_LIGHTING)
+			glEnable(GL_NORMALIZE)
+		else
+			glDisable(GL_LIGHTING)
+			glDisable(GL_NORMALIZE)
+		end if
+
+		Gfx.Update and= not(CHANGED_GEOMETRYMODE)
+		
+	 /'
+	if(Gfx.GeometryMode & G_ZBUFFER) {
+		glEnable(GL_DEPTH_TEST);
+	} else {
+		glDisable(GL_DEPTH_TEST);
+	}
+        '/
+        
+        if(Gfx.Update and CHANGED_RENDERMODE) then
+ 		if(Gfx.OtherMode.depthCompare) then
+			glDepthFunc(GL_LEQUAL)
+		 else 
+			glDepthFunc(GL_ALWAYS)
+		end if
+
+		if(Gfx.OtherMode.depthUpdate) then
+			glDepthMask(GL_TRUE)
+		 else 
+			glDepthMask(GL_FALSE)
+		end if
+ 
+		if(Gfx.OtherMode.depthMode = ZMODE_DEC) then
+			glEnable(GL_POLYGON_OFFSET_FILL)
+			glPolygonOffset(-3.0f, -3.0f)
+		  else
+			glDisable(GL_POLYGON_OFFSET_FILL)
+		end if
+	endif
+
+	if((Gfx.Update and CHANGED_ALPHACOMPARE) orelse (Gfx.Update and CHANGED_RENDERMODE)) then
+		if((Gfx.OtherMode.L and ALPHA_CVG_SEL) = 0) then
+			glEnable(GL_ALPHA_TEST)
+			glAlphaFunc(iif(Gfx.BlendColor.A > 0.0f, GL_GEQUAL, GL_GREATER), Gfx.BlendColor.A)
+
+		  elseif(Gfx.OtherMode.L and CVG_X_ALPHA) then
+			glEnable(GL_ALPHA_TEST)
+			glAlphaFunc(GL_GEQUAL, 0.5f)
+
+		  else
+			glDisable(GL_ALPHA_TEST)
+		 end if
+	end if
+
+	if(Gfx.Update and CHANGED_RENDERMODE) then
+		if((Gfx.OtherMode.L and FORCE_BL) andalso (Gfx.OtherMode.L and ALPHA_CVG_SEL) = 0) then
+			glEnable(GL_BLEND)
+
+			select case(Gfx.OtherMode.L shr 16)
+				case &H0448 '// Add
+				        glBlendFunc(GL_ONE, GL_ONE)
+				case &H055A:
+					glBlendFunc(GL_ONE, GL_ONE)
+					
+				case &H0C08  '// 1080 Sky
+				        glBlendFunc(GL_ONE, GL_ZERO)
+				case &H0F0A '// Used LOTS of places
+					glBlendFunc(GL_ONE, GL_ZERO)
+					 
+				case &HC810 '// Blends fog
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+				case &HC811 '// Blends fog
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+				case &H0C18 '// Standard interpolated blend
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+				case &H0C19 '// Used for antialiasing
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+				case &H0050 '// Standard interpolated blend
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+				case &H0055 '// Used for antialiasing
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+				case &H0FA5 '// Seems to be doing just blend color - maybe combiner can be used for this?
+				glBlendFunc(GL_ZERO, GL_ONE)
+				case &H5055 '// Used in Paper Mario intro, I'm not sure if this is right...
+					glBlendFunc(GL_ZERO, GL_ONE)
+					
+
+				case else
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+				
+			end select
+		  else
+			glDisable(GL_BLEND)
+		end if
+
+		Gfx.Update and= not(CHANGED_RENDERMODE)
+	end if
+	        
+end if
+
+
+
 
 end sub
 
 Function RDP_OpenGL_ExtFragmentProgram() As Boolean
-
+return OpenGL.Ext_FragmentProgram
 end function

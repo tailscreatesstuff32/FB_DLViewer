@@ -13,6 +13,10 @@ Enum _RenderOpts
 End Enum
 
 
+enum  UcodeI 
+F3D, F3DEX, F3DEX2
+end enum
+
 extern as _Renderopts renderopts
 
 type __RAM 

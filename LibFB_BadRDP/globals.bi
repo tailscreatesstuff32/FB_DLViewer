@@ -63,14 +63,15 @@ extern as PFNGLPROGRAMLOCALPARAMETER4FARBPROC	glProgramLocalParameter4fARB
 
 
 
-	
-  #define _SHIFTR( v, s, w ) _
-    ((cast(ulong,v) shr ((&H01 shl w) - 1))
- 
- 
  
  #define _SHIFTL( v, s, w ) _
     ((cast(ulong,v) and ((&H01 shl w) - 1)) shl s)
+    	
+  #define _SHIFTR( v, s, w ) _
+    ((cast(ulong,v)shr s) and ((&H01 shl w) - 1))
+ 
+ 
+
     
 
 
@@ -258,16 +259,8 @@ end type
 
 
 
-
-type __Gfx
-        as integer DLStack(16)
-	as integer DLStackPos
-
-	as uinteger Update
-	as uinteger GeometryMode
-
-	type OtherMode
-	   union
+type _othermode
+  union
 	   	type
 	   	
 	   			as uinteger alphaCompare : 2 
@@ -311,18 +304,28 @@ type __Gfx
 
 				as uinteger pad : 8
 
-	    
-	   	end type
-	   	
+end type
+
 	   	as uint64_t _u64 
 
 			type
 				as uinteger L, H 
 			end type
-	   end union
-	   
-	 end type   
-	   
+
+end union
+end type
+
+
+type __Gfx
+public:
+        as integer DLStack(16)
+	as integer DLStackPos
+
+	as uinteger Update
+	as uinteger GeometryMode
+
+	OtherMode as _OtherMode
+
 	as GLfloat LightAmbient(4)
 	as GLfloat LightDiffuse(4)
 	as GLfloat LightSpecular(4)
@@ -374,16 +377,18 @@ extern as __OpenGL OpenGL
 #include "badrdp.bi"
 #include "opengl.bi"
 #include "dlparse.bi"
-/'#include "gbi.bi"
-#include "gdp.bi"
-#include "gsp.bi"
-#include "rdp.bi"
-#include "matrix.bi"
-#include "macro.bi"
-#include "f3d.bi"
-#include "f3dex.bi"
-#include "f3dex2.bi"
+#include "gbi.bi"
+
 #include "dump.bi"
+#include "rdp.bi"
+#include "macro.bi"
+#include "f3dex.bi"
+#include "f3d.bi"
+
+#include "gdp.bi"
+/'#include "gsp.bi"
+#include "matrix.bi"
+#include "f3dex2.bi"
 #include "combine.bi"
 #include "crc.bi" '/
 

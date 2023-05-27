@@ -10,7 +10,7 @@ FBFLAGS = -lib
 #FBFLAGS =
 
 # Application pieces
-PIECES	=  opengl.bas dlparse.bas dump.bas combine.bas matrix.bas
+PIECES	=  opengl.bas dlparse.bas dump.bas combine.bas matrix.bas macro.bas rdp.bas f3dex.bas f3d.bas f3dex2.bas gdp.bas
  
   
 # Make
