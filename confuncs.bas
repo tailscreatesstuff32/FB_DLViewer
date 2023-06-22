@@ -142,7 +142,7 @@ sub cn_Cmd_LoadFile(_Ptr as ubyte ptr)
 	  else 
 		dim as int32_t  Segment = -1 
 		dim as zstring * MAX_PATH Filename
-		memset(@Filename, 0, sizeof(Filename))
+		memset(@Filename, 0, len(Filename))
 		sscanf(cast(zstring ptr,_Ptr+1), "0x%02X %s", @Segment, cast(zstring ptr,@filename))
 
 		if((Filename[0] = &H00) orelse (Segment = -1))  then
@@ -154,12 +154,8 @@ sub cn_Cmd_LoadFile(_Ptr as ubyte ptr)
 		if(DoScript) then
 			strcpy(TempString, WorkingDir)
 			strcat(TempString, Filename)
-			 dbgprintf(0, MSK_COLORTYPE_ERROR, "0x%02X %s",Segment,Filename)
 			dl_LoadFileToSegment(TempString, Segment)
 		 else 
-		 
-		 
-		 dbgprintf(0, MSK_COLORTYPE_ERROR, "0x%02X %s",Segment,Filename)
 	         dl_LoadFileToSegment(Filename, Segment)
 		end if
 	end if
@@ -253,8 +249,10 @@ sub cn_Cmd_AddDList(_Ptr as ubyte ptr)
 		dbgprintf(0, MSK_COLORTYPE_INFO, "Added Display List address 0x%08X.", Address)
 		zProgram.DListCount+=1
 		zProgram.DListAddr(zProgram.DListCount) = Address
-
+		
+               ' RDP_Dump_InitModelDumping(".","Dlist_0x" + hex(Address,8) + ".obj","Dlist_0x" + hex(Address,8) + ".mtl")
 		gl_CreateSceneDLists()
+		'RDP_Dump_StopModelDumping()
 	end if
 
 end sub

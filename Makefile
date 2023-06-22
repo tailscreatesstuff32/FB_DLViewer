@@ -2,7 +2,12 @@ PROJECT = FB_DL_Viewer
 TARGET = $(PROJECT)
 
 # Environment
-FB = fbc
+#FB = fbc 
+#FB = fbc -gen gas64
+#FB = fbc32 -Wc -Wno-builtin-declaration-mismatch,-Wno-memset-elt-size -gen gcc
+FB = fbc32 -Wc -w -w none  -gen gcc
+
+
 
 # Utils flags
 #CFLAGS = -Wall -U_FORTIFY_SOURCE

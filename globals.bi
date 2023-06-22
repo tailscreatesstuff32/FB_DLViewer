@@ -67,7 +67,7 @@ end type
 #include "GL/glx.bi"
 #include "GL/glext.bi"
 
-#include "png.bi"
+#include "png12.bi"
 #include "curses/ncurses.bi"
 
 #include "misaka.bi"
@@ -116,12 +116,12 @@ end type
  
  
   #define _SHIFTR( v, s, w ) _
-    ((cast(ulong,v) shr ((&H01 shl w) - 1))
+    ((cast(uinteger,v) shr ((&H01 shl w) - 1))
  
  
  
  #define _SHIFTL( v, s, w ) _
-    ((cast(ulong,v) and ((&H01 shl w) - 1)) shl s)
+    ((cast(uinteger,v) and ((&H01 shl w) - 1)) shl s)
     
  #define ArraySize(x)	ubound(x)  + 1
  

@@ -2,10 +2,10 @@
 
 
 
-#inclib "png"
+'#inclib "png"
 '#inclib "badRDP"
 #inclib "FB_BadRDP"
-'#inclib "GLEW"
+#inclib "GLEW"
 
 #include "globals.bi"
  
@@ -118,7 +118,7 @@ function  DoMainKbdInput() as integer
 
 	if(zProgram._Key(KEY_GUI_TOGGLEHUD)) then
 	'beep
-	dbgprintf(0, MSK_COLORTYPE_INFO, !"%i\n",KEY_GUI_TOGGLEHUD) 
+	'dbgprintf(0, MSK_COLORTYPE_INFO, !"%i\n",KEY_GUI_TOGGLEHUD) 
 	
 	
 	
@@ -127,7 +127,7 @@ function  DoMainKbdInput() as integer
 	end if
 
 	if(zProgram._Key(KEY_GUI_TOGGLEGRID))  then
-	dbgprintf(0, MSK_COLORTYPE_INFO, !"%i\n",KEY_GUI_TOGGLEGRID)
+	'dbgprintf(0, MSK_COLORTYPE_INFO, !"%i\n",KEY_GUI_TOGGLEGRID)
 		zOptions.EnableGrid xor= 1 
 		zProgram._Key(KEY_GUI_TOGGLEGRID) = false 
 	end if
@@ -224,20 +224,28 @@ function main(argc as integer, argv as zstring ptr ptr) as integer
  
   
  		
- 	RDP_SetupOpenGL()
+ 
  	
  	'MSK_ConsolePrint(MSK_COLORTYPE_ERROR,!"%s\n",strdup(glgetstring(GL_EXTENSIONS)))
 
  	
  	'sleep
  	
- 	
+ 	RDP_SetupOpenGL()
 	RDP_SetRendererOptions(BRDP_TEXTURES or BRDP_COMBINER or BRDP_TEXCRC /' or BRDP_WIREFRAME'/ )	
  	dl_ViewerInit(F3DEX2)
+ 	
+ 	
+ 	'RDP_EnableARB()
+ 	
  	
  	gl_SetupScene3D(zProgram.WindowWidth, zProgram.WindowHeight)
  	
  	gl_CreateViewerDLists()
+ 	
+ 	
+ 	
+ 	
  	
  	zProgram.ScaleFactor = 0.1f
 	zProgram.DListCount = -1

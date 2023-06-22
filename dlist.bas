@@ -1,5 +1,6 @@
 #include "globals.bi"
 
+
 dim shared as ubyte Cmd_DL = 0
 dim shared as ubyte Cmd_ENDDL = 0
 dim shared as ubyte Cmd_TEXTURE = 0
@@ -14,11 +15,9 @@ sub dl_ViewerInit(UCode as integer)
 		RDP_InitParser(zProgram.UCode)
 
 		select case (zProgram.UCode) 
-			case F3D
-				Cmd_DL = &H06
-				Cmd_ENDDL = &HB8
-				Cmd_TEXTURE = &HBB
-			case F3DEX
+ 
+			case F3D, _
+			      F3DEX	
 				Cmd_DL = &H06
 				Cmd_ENDDL = &HB8
 				Cmd_TEXTURE = &HBB
@@ -38,23 +37,24 @@ end sub
 
 
 
-function dl_IsDLEndInBetween(Segment as ubyte, From as uinteger, _To as uinteger) as bool
+function dl_IsDLEndInBetween(Segment as ubyte, _From as uinteger, _To as uinteger) as bool
  
-	dim as integer i = From 
+	dim as integer i = _From 
 
-	do while i < cast(integer,_to)
+	do while i <  _to 
 
 		dim as uinteger W0 = Read32(RAM(Segment)._Data, i) 
 		dim as uinteger W1  = Read32(RAM(Segment)._Data, i + 4) 
-
-		if cast(integer,W0 ) = (Cmd_ENDDL shl 24) andalso cast(integer,w1 ) then return true
-
+ 
+	'dbgprintf(0, MSK_COLORTYPE_INFO, "%08X", W0)
+		if  (w0  = (Cmd_ENDDL shl 24)) andalso  (w1  = 0) then return true
+            
 		i+=1
 	loop
 
  
 
-	return false 
+	return false
 end function
 
 
@@ -102,16 +102,19 @@ dim as FILE ptr file
 	dim as integer _Size = ftell(file)
 	rewind(file)
 	 
+       ' msk_consoleprint(4, "%i",_size)
 	
 	dim as ubyte ptr _data = cast(ubyte ptr, malloc (sizeof(ubyte) * _Size))
 	
 	
 	fread(_Data, 1, _Size, file)
 	fclose(file)
-
+	
+	
 	dl_ViewerInit(zProgram.UCode)
 
-	if(RDP_CheckAddressValidity(Segment shl 24) = 0) then
+	if(RDP_CheckAddressValidity(Segment shl 24)) then
+	'beep
 	 	RDP_ClearSegment(Segment)
 	end if
 
@@ -125,7 +128,7 @@ end sub
 
 
 
-sub dl_FindDLists(Segment as ubyte)
+  sub dl_FindDLists(Segment as ubyte)
  
 	zProgram.DListCount = -1
 	zProgram.DListSel = -1
@@ -133,7 +136,7 @@ sub dl_FindDLists(Segment as ubyte)
 	dim as integer i = 0
 	dim as uinteger FullAddr = 0
 
-	do while 1
+	 do while 1
 		FullAddr = ((Segment shl 24) or i) 
 		if(RDP_CheckAddressValidity(FullAddr + 8) = 0) then exit do
 
@@ -141,14 +144,14 @@ sub dl_FindDLists(Segment as ubyte)
 		dim as uinteger W0 = Read32(RAM(Segment)._Data, i) 
 		dim as uinteger W1  = Read32(RAM(Segment)._Data, i + 4) 
 		 
-		if cast(integer,w0) = (Cmd_DL shl 24) and cast(integer, 0) <> 0 andalso  (RDP_CheckAddressValidity(W1))  then
+		if cast(integer,w0) = (Cmd_DL shl 24) andalso (cast(integer,w1)  <> 0) andalso  (RDP_CheckAddressValidity(W1))  then
 			zProgram.DListCount += 1
 			zProgram.DListAddr(zProgram.DListCount) = W1
 			dbgprintf(0, MSK_COLORTYPE_INFO, "Found Display List at address 0x%08X.", zProgram.DListAddr(zProgram.DListCount))
 		end if
 
 		i += 8
-	loop
+	loop  
 
 	i = 0
 
@@ -167,12 +170,12 @@ sub dl_FindDLists(Segment as ubyte)
 		 
 			
 
-		 	if(	((W0 = &HE7000000) andalso (W1 = 0)) orelse _
-				((W0 = &HE8000000) andalso (W1 = 0)) orelse _
-				(W0 shr 8 = &HFA0000) orelse _
-				(W0 = &HFB000000) orelse _
-				(cast(integer,W0) shr 8 = (Cmd_TEXTURE shl 16)) orelse _
-				((W0 shr 24 = &HFD) andalso ((W0 and &H0000FFFF) = 0)) ) andalso (RDP_CheckAddressValidity(W1)) then
+		 	if ( ((W0 = &HE7000000) andalso (W1 = 0)) orelse _
+		 	 ((W0 = &HE8000000)  andalso (W1 = 0)) orelse _
+		 	 ((W0 shr 8) = &HFA0000) orelse  _
+		 	 ((W0 shr 8) = &HFB000000) orelse _
+		 	  (w0  shr 8) =  (Cmd_TEXTURE shl 16) orelse _
+		 	  ((W0 shr 24 = &HFD) andalso ((W0 and &H0000FFFF) = 0) andalso (RDP_CheckAddressValidity(W1)))) then
 				
 				 	if(zProgram.DListCount = -1)  then
 				 	zProgram.DListCount +=1
@@ -180,16 +183,16 @@ sub dl_FindDLists(Segment as ubyte)
 						zProgram.DListAddr(zProgram.DListCount) = FullAddr
 						dbgprintf(0, MSK_COLORTYPE_INFO, "Found initial Display List at address 0x%08X.", zProgram.DListAddr(zProgram.DListCount) )
 				 	 else  
-					'//	dbgprintf(0,0,"%08X -> %08X",i,RAM[Segment].Size);
+					' 	dbgprintf(0,0,"%08X -> %08X",i,RAM[Segment].Size);
 					
-					
-					if  dl_IsDLEndInBetween(Segment, (zProgram.DListAddr(zProgram.DListCount) and &H00FFFFFF), i) andalso _
-					    dl_IsDLEndInBetween(Segment, i, RAM(Segment)._Size)  then
-					 			zProgram.DListCount +=1
-								 zProgram.DListAddr(zProgram.DListCount) = FullAddr
-								dbgprintf(0, MSK_COLORTYPE_INFO, "Assuming next Display List at address 0x%08X.",  zProgram.DListAddr(zProgram.DListCount)) 
-							end if
-					end if
+				 
+					 if  dl_IsDLEndInBetween(Segment, (zProgram.DListAddr(zProgram.DListCount) and &H00FFFFFF), i) andalso _
+					     dl_IsDLEndInBetween(Segment, i, RAM(Segment)._Size)  then
+					 	 		zProgram.DListCount +=1
+							 	 zProgram.DListAddr(zProgram.DListCount) = FullAddr
+								 dbgprintf(0, MSK_COLORTYPE_INFO, "Assuming next Display List at address 0x%08X.",  zProgram.DListAddr(zProgram.DListCount)) 
+						 end if
+					 end if
 			end if
 
 			i += 8
@@ -199,6 +202,6 @@ sub dl_FindDLists(Segment as ubyte)
 	if(zProgram.DListCount = 0) then zProgram.DListSel = 0
 
 	dbgprintf(0, MSK_COLORTYPE_INFO, "Found %i Display Lists.", zProgram.DListCount + 1)
-end sub
+end sub  
 
-
+ 
