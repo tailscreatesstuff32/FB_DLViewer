@@ -2,15 +2,17 @@ PROJECT = libFB_BadRDP
 TARGET = $(PROJECT).a
 
 # Environment
-FB = fbc
-FBFLAGS = -lib
+FB = fbc32
+FBFLAGS =  -Wc -w -w none -gen gcc -lib
 
 # Utils flags
 #CFLAGS = -Wall -U_FORTIFY_SOURCE
 #FBFLAGS =
 
 # Application pieces
-PIECES	=  opengl.bas dlparse.bas dump.bas combine.bas matrix.bas macro.bas rdp.bas f3dex.bas f3d.bas f3dex2.bas gdp.bas
+PIECES	=   combine.bas dump.bas f3dex2.bas gdp.bas macro.bas  opengl.bas\
+	    dlparse.bas f3d.bas  f3dex.bas  gsp.bas matrix.bas rdp.bas \
+	    crc.bas
  
   
 # Make

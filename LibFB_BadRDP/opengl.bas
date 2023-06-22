@@ -17,7 +17,7 @@ RDP_ResetOpenGL()
 
 end sub
 
-sub RDP_SetOpenGLDimensions(_Width As Integer, _Height As Integer)
+sub RDP_SetOpenGLDimensions(_Width As integer, _Height As integer)
 	_System.DrawWidth = _Width
 	_System.DrawHeight = _Height
 end sub
@@ -119,6 +119,11 @@ End If
 
 If strstr(OpenGL.ExtensionList, "GL_ARB_multitexture") <> Null Then
     OpenGL.Ext_MultiTexture = True
+    
+    
+    
+    
+     
     #ifdef WIN32
     OpenGL.glMultiTexCoord1fARB = Cast(PFNGLMULTITEXCOORD1FARBPROC, wglGetProcAddress("glMultiTexCoord1fARB"))
     OpenGL.glMultiTexCoord2fARB = Cast(PFNGLMULTITEXCOORD2FARBPROC, wglGetProcAddress("glMultiTexCoord2fARB"))
@@ -172,6 +177,11 @@ if OpenGL.ExtUnsupported <> "" then  MSK_ConsolePrint(2, !"%sunsupported\n",Open
 
 if OpenGL.ExtSupported <> "" then MSK_ConsolePrint(1, !"%ssupported\n",OpenGL.ExtSupported)
 
+if OpenGL.Ext_TexMirroredRepeat = true then MSK_ConsolePrint(3, !"OpenGL.Ext_TexMirroredRepeat = true" )
+if OpenGL.Ext_MultiTexture = true then MSK_ConsolePrint(3, !"OpenGL.Ext_MultiTexture = true" )
+if OpenGL.Ext_FragmentProgram = true then MSK_ConsolePrint(3, !"OpenGL.Ext_FragmentProgram = true" )
+
+
 end sub
 
 sub RDP_ClearTextures()
@@ -186,7 +196,9 @@ end sub
 
 
 sub RDP_UpdateGLStates()
+
 	if(Gfx.Update and CHANGED_GEOMETRYMODE) then
+	 
 		if(Gfx.GeometryMode and G_CULL_BOTH) then
 			glEnable(GL_CULL_FACE)
 
@@ -196,22 +208,26 @@ sub RDP_UpdateGLStates()
 				glCullFace(GL_FRONT)
 			end if
 		  else 
+ 
 			glDisable(GL_CULL_FACE)
 		end if
 		
 		
 		if((Gfx.GeometryMode and G_TEXTURE_GEN_LINEAR) andalso (Gfx.GeometryMode and G_LIGHTING) = 0 andalso (_System.Options and BRDP_DISABLESHADE)) then
+		'beep
 			glShadeModel(GL_FLAT)
 		  else 
 			glShadeModel(GL_SMOOTH)
 		end if
 
 		if(Gfx.GeometryMode and G_TEXTURE_GEN) then
+		
 			glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP)
 			glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP)
 			glEnable(GL_TEXTURE_GEN_S)
 			glEnable(GL_TEXTURE_GEN_T)
 		 else
+		 
 			glDisable(GL_TEXTURE_GEN_S)
 			glDisable(GL_TEXTURE_GEN_T)
 		end if
@@ -224,7 +240,7 @@ sub RDP_UpdateGLStates()
 		end if
                 '/
                 
-                if(Gfx.GeometryMode and G_LIGHTING andalso (_System.Options and BRDP_DISABLESHADE)) then
+                if(Gfx.GeometryMode and G_LIGHTING andalso (_System.Options and BRDP_DISABLESHADE) = 0) then
 			glEnable(GL_LIGHTING)
 			glEnable(GL_NORMALIZE)
 		else
@@ -243,7 +259,7 @@ sub RDP_UpdateGLStates()
         '/
         
         if(Gfx.Update and CHANGED_RENDERMODE) then
- 		if(Gfx.OtherMode.depthCompare) then
+ 	/'	if(Gfx.OtherMode.depthCompare) then
 			glDepthFunc(GL_LEQUAL)
 		 else 
 			glDepthFunc(GL_ALWAYS)
@@ -253,7 +269,7 @@ sub RDP_UpdateGLStates()
 			glDepthMask(GL_TRUE)
 		 else 
 			glDepthMask(GL_FALSE)
-		end if
+		end if  '/
  
 		if(Gfx.OtherMode.depthMode = ZMODE_DEC) then
 			glEnable(GL_POLYGON_OFFSET_FILL)
@@ -280,41 +296,36 @@ sub RDP_UpdateGLStates()
 	if(Gfx.Update and CHANGED_RENDERMODE) then
 		if((Gfx.OtherMode.L and FORCE_BL) andalso (Gfx.OtherMode.L and ALPHA_CVG_SEL) = 0) then
 			glEnable(GL_BLEND)
-
+		
 			select case(Gfx.OtherMode.L shr 16)
-				case &H0448 '// Add
-				        glBlendFunc(GL_ONE, GL_ONE)
-				case &H055A:
+				case &H055A, _
+				     &H0448 
 					glBlendFunc(GL_ONE, GL_ONE)
 					
-				case &H0C08  '// 1080 Sky
-				        glBlendFunc(GL_ONE, GL_ZERO)
-				case &H0F0A '// Used LOTS of places
+				case &H0C08, _  '// 1080 Sky
+				     &H0F0A     '// Used LOTS of places
 					glBlendFunc(GL_ONE, GL_ZERO)
 					 
-				case &HC810 '// Blends fog
+				case &HC810, _  '// Blends fog
+				     &HC811, _  '// Blends fog
+				     &H0C18, _  '// Standard interpolated blend
+				     &H0C19, _  '// Used for antialiasing
+				     &H0050, _  '// Standard interpolated blend
+				     &H0055     '// Used for antialiasing
+				     'beep
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-				case &HC811 '// Blends fog
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-				case &H0C18 '// Standard interpolated blend
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-				case &H0C19 '// Used for antialiasing
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-				case &H0050 '// Standard interpolated blend
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-				case &H0055 '// Used for antialiasing
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-				case &H0FA5 '// Seems to be doing just blend color - maybe combiner can be used for this?
+				case &H0FA5, _  '// Seems to be doing just blend color - maybe combiner can be used for this?
+				     &H5055     '// Used in Paper Mario intro, I'm not sure if this is right...
 				glBlendFunc(GL_ZERO, GL_ONE)
-				case &H5055 '// Used in Paper Mario intro, I'm not sure if this is right...
-					glBlendFunc(GL_ZERO, GL_ONE)
 					
 
 				case else
+				
 					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 				
 			end select
 		  else
+		  	' beep
 			glDisable(GL_BLEND)
 		end if
 

@@ -4,6 +4,9 @@
 
 ' Function definition
 Sub RDP_F3DEX_Init ()
+
+    RDP_InitFlags(F3DEX)
+
     RDP_UcodeCmd(F3D_MTX)               = @RDP_F3D_MTX
     RDP_UcodeCmd(F3D_MOVEMEM)           = @RDP_F3D_MOVEMEM
     RDP_UcodeCmd(F3D_VTX)               = @RDP_F3DEX_VTX
@@ -32,11 +35,12 @@ End Sub
 
 ' Function definitions
 Sub RDP_F3DEX_VTX ()
-       msk_consoleprint(0,"G_VTX")
+       ' msk_consoleprint(0,"G_VTX")
+      gSP_Vertex(w1, _SHIFTR(w0, 10, 6), _SHIFTR(w0, 17, 7))
 End Sub
 
 Sub RDP_F3DEX_LOAD_UCODE ()
-    ' Function implementation goes here
+        ' //
 End Sub
 
 Sub RDP_F3DEX_BRANCH_Z ()
@@ -53,20 +57,26 @@ Sub RDP_F3DEX_BRANCH_Z ()
 	end if
 End Sub
 
-Sub RDP_F3DEX_TRI2 ()
-  msk_consoleprint(0,"G_TRI2")
-  
+Sub RDP_F3DEX_TRI2()
+    ' msk_consoleprint(0, "G_TRI2")
+    Dim As integer Vtxs1(0 To ...) = { _SHIFTR(w0, 17, 7), _SHIFTR(w0, 9, 7), _SHIFTR(w0, 1, 7) }
+    RDP_DrawTriangle(@Vtxs1(0))
+
+    Dim As integer Vtxs2(0 To ...) = { _SHIFTR(w1, 17, 7), _SHIFTR(w1, 9, 7), _SHIFTR(w1, 1, 7) }
+    RDP_DrawTriangle(@Vtxs2(0))
 End Sub
 
+
 Sub RDP_F3DEX_MODIFYVTX ()
-    ' Function implementation goes here
+     ' //
 End Sub
 
 Sub RDP_F3DEX_CULLDL ()
-    ' Function implementation goes here
+    ' //
 End Sub
 
 Sub RDP_F3DEX_TRI1 ()
-    ' Function implementation goes here
+   	Dim As integer Vtxs(0 To ...) = { _SHIFTR( w1, 17, 7 ), _SHIFTR( w1, 9, 7 ), _SHIFTR( w1, 1, 7 ) }
+	RDP_DrawTriangle(@Vtxs(0))
 End Sub
 

@@ -1,5 +1,5 @@
 Type __GfxMacro
-    _Len As Integer
+    _Len As integer
     Func As RDPInstruction
     _Cmd(32) as byte
 End Type

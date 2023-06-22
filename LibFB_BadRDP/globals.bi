@@ -23,7 +23,14 @@
 #define MAX_PATH	PATH_MAX
 #endif
 
-#include "png.bi"
+#include "png12.bi"
+
+
+
+#ifndef EXIT_FAILURE
+#define EXIT_FAILURE 1
+
+#endif
 
 extern "c"
 Declare Function strdup (ByVal source As const zString ptr) As  zString ptr
@@ -72,9 +79,13 @@ extern as PFNGLPROGRAMLOCALPARAMETER4FARBPROC	glProgramLocalParameter4fARB
  
  
 
-    
+declare Function IsInfinite(value As Double) As Boolean
 
+'declare Function IsNan1(value As Double) As Boolean
 
+extern "c"
+declare function __isnan (byval _x as double) as long
+end extern
 
 #define FIXED2FLOATRECIP1	0.5f
 #define FIXED2FLOATRECIP2	0.25f
@@ -103,35 +114,38 @@ extern as PFNGLPROGRAMLOCALPARAMETER4FARBPROC	glProgramLocalParameter4fARB
  #define Read32(Buffer, Offset) _
 	(Buffer[Offset] shl 24) or (Buffer[(Offset) + 1] shl 16) or (Buffer[(Offset) + 2] shl 8) or Buffer[(Offset) + 3]
 	
-#define Write32(Buffer, Offset, Value)  _
-	Buffer[Offset] = (Value1 and &HFF000000) shr 24 _
-	Buffer[Offset + 1] = (Value1 and &H00FF0000) shr 16 _
-	Buffer[Offset + 2] = (Value1 and &H0000FF00) shr 8 _
-	Buffer[Offset + 3] = (Value1 and &H000000FF) _
+#define Write32(Buffer, Offset, Value1)  _
+	Buffer[Offset] = (Value1 and &HFF000000) shr 24: _
+	Buffer[Offset + 1] = (Value1 and &H00FF0000) shr 16: _
+	Buffer[Offset + 2] = (Value1 and &H0000FF00) shr 8: _
+	Buffer[Offset + 3] = (Value1 and &H000000FF)
 
     
 #ifndef isnan
 #define isnan(x) ((x) <> (x))
 #endif
-    
+    extern "c"
+Declare Function isinf (_value As Single) As Integer
+end extern
+
     
  #define ArraySize(x)	ubound(x)  + 1
  
 
 
 type __System
-    DrawWidth as integer
-    DrawHeight as integer
+    DrawWidth as long
+    DrawHeight as long
 
-    FragCachePosition as unsigned integer
-    TextureCachePosition as unsigned integer
+    FragCachePosition as ulong
+    TextureCachePosition as ulong
 
     ObjDumpingEnabled as boolean
     WavefrontObjPath as string * MAX_PATH
     FileWavefrontObj as FILE ptr
     FileWavefrontMtl as FILE ptr
-    WavefrontObjVertCount as unsigned integer
-    WavefrontObjMaterialCnt as unsigned integer
+    WavefrontObjVertCount as ulong
+    WavefrontObjMaterialCnt as ulong
 
     Options as ubyte
 end type
@@ -141,8 +155,8 @@ type __Matrix
 	as single Model(4,4)
 	as single Proj(4,4)
 	as single ModelStack(32,4,4)
-	as integer ModelStackSize
-	as integer ModelIndex
+	as long ModelStackSize
+	as long ModelIndex
 
 	as boolean UseMatrixHack
 end type
@@ -176,40 +190,40 @@ type __Palette
 end type
 
 type __Texture
-	as uinteger Offset
+	as ulong Offset
 
-	as uinteger _Format
-	as uinteger Tile
-	as uinteger _Width
-	as uinteger RealWidth
-	as uinteger _Height
-	as uinteger RealHeight
-	as uinteger  ULT, ULS
-	as uinteger LRT, LRS
-	as uinteger LineSize, Palette
-	as uinteger MaskT, MaskS
-	as uinteger ShiftT, ShiftS
+	as ulong _Format
+	as ulong Tile
+	as ulong _Width
+	as ulong RealWidth
+	as ulong _Height
+	as ulong RealHeight
+	as ulong  ULT, ULS
+	as ulong LRT, LRS
+	as ulong LineSize, Palette
+	as ulong MaskT, MaskS
+	as ulong ShiftT, ShiftS
 	union 
 		type
-			as uinteger mirrort : 1
-			as uinteger clampt : 1
-			as uinteger pad0 : 30
-			as uinteger mirrors : 1
-			as uinteger clamps : 1
-			as uinteger pad1 : 30
+			as ulong mirrort : 1
+			as ulong clampt : 1
+			as ulong pad0 : 30
+			as ulong mirrors : 1
+			as ulong clamps : 1
+			as ulong pad1 : 30
 		end type
 		type
-			as uinteger CMT, CMS
+			as ulong CMT, CMS
 		end type
 	end union
 	as single ScaleT, ScaleS
 	as single ShiftScaleT, ShiftScaleS
 
 	as boolean IsTexRect
-	as uinteger TexRectW
-	as uinteger TexRectH
+	as ulong TexRectW
+	as ulong TexRectH
 
-	as uinteger CRC32
+	as ulong CRC32
 end type
 
 type __RGBA
@@ -242,19 +256,19 @@ end type
 
 
 type __FragmentCache
-	as uinteger Combiner0
-	as uinteger Combiner1
+	as ulong Combiner0
+	as ulong Combiner1
 	as GLuint ProgramID
 end type
 
 type __TextureCache 
-	as uinteger Offset
-	as uinteger RealWidth
-	as uinteger RealHeight
-	as uinteger CRC32
+	as ulong Offset
+	as ulong RealWidth
+	as ulong RealHeight
+	as ulong CRC32
 	as GLuint TextureID
 
-	as integer MaterialID
+	as long MaterialID
 end type
 
 
@@ -263,53 +277,53 @@ type _othermode
   union
 	   	type
 	   	
-	   			as uinteger alphaCompare : 2 
-	   			as uinteger AAEnable : 1
-				as uinteger depthCompare : 1
-				as uinteger depthUpdate : 1
-				as uinteger imageRead : 1
-				as uinteger clearOnCvg : 1
+	   			as ulong alphaCompare : 2 
+	   			as ulong AAEnable : 1
+				as ulong depthCompare : 1
+				as ulong depthUpdate : 1
+				as ulong imageRead : 1
+				as ulong clearOnCvg : 1
 
-				as uinteger cvgDest : 2
-				as uinteger depthMode : 2
+				as ulong cvgDest : 2
+				as ulong depthMode : 2
 
-				as uinteger cvgXAlpha : 1
-				as uinteger alphaCvgSel : 1
-				as uinteger forceBlender : 1
-				as uinteger textureEdge : 1
+				as ulong cvgXAlpha : 1
+				as ulong alphaCvgSel : 1
+				as ulong forceBlender : 1
+				as ulong textureEdge : 1
 
-				as uinteger c2_m2b : 2
-				as uinteger c1_m2b : 2
-				as uinteger c2_m2a : 2
-				as uinteger c1_m2a : 2
-				as uinteger c2_m1b : 2
-				as uinteger c1_m1b : 2
-				as uinteger c2_m1a : 2
-				as uinteger c1_m1a : 2
+				as ulong c2_m2b : 2
+				as ulong c1_m2b : 2
+				as ulong c2_m2a : 2
+				as ulong c1_m2a : 2
+				as ulong c2_m1b : 2
+				as ulong c1_m1b : 2
+				as ulong c2_m1a : 2
+				as ulong c1_m1a : 2
 
-				as uinteger blendMask : 4
-				as uinteger alphaDither : 2
-				as uinteger colorDither : 2
+				as ulong blendMask : 4
+				as ulong alphaDither : 2
+				as ulong colorDither : 2
 
-				as uinteger combineKey : 1
-				as uinteger textureConvert : 3
-				as uinteger textureFilter : 2
-				as uinteger textureLUT : 2
+				as ulong combineKey : 1
+				as ulong textureConvert : 3
+				as ulong textureFilter : 2
+				as ulong textureLUT : 2
 
-				as uinteger textureLOD : 1
-				as uinteger textureDetail : 2
-				as uinteger texturePersp : 1
-				as uinteger cycleType : 2
-				as uinteger pipelineMode : 1
+				as ulong textureLOD : 1
+				as ulong textureDetail : 2
+				as ulong texturePersp : 1
+				as ulong cycleType : 2
+				as ulong pipelineMode : 1
 
-				as uinteger pad : 8
+				as ulong pad : 8
 
 end type
 
 	   	as uint64_t _u64 
 
 			type
-				as uinteger L, H 
+				as ulong L, H 
 			end type
 
 end union
@@ -318,11 +332,11 @@ end type
 
 type __Gfx
 public:
-        as integer DLStack(16)
-	as integer DLStackPos
+        as long DLStack(16)
+	as long DLStackPos
 
-	as uinteger Update
-	as uinteger GeometryMode
+	as ulong Update
+	as ulong GeometryMode
 
 	OtherMode as _OtherMode
 
@@ -330,8 +344,8 @@ public:
 	as GLfloat LightDiffuse(4)
 	as GLfloat LightSpecular(4)
 	as GLfloat LightPosition(4)
-	as uinteger Store_RDPHalf1, Store_RDPHalf2
-	as uinteger Combiner0, Combiner1
+	as ulong Store_RDPHalf1, Store_RDPHalf2
+	as ulong Combiner0, Combiner1
 
 	as __RGBA BlendColor
 	as __RGBA EnvColor
@@ -340,10 +354,10 @@ public:
 	as __PrimColor PrimColor
 
 	as boolean IsMultiTexture
-	as integer CurrentTexture
+	as long CurrentTexture
 
 	as GLuint GLTextureID(CACHE_TEXTURES)
-	as integer GLTextureCount
+	as long GLTextureCount
 	
 
 
@@ -386,10 +400,13 @@ extern as __OpenGL OpenGL
 #include "f3d.bi"
 
 #include "gdp.bi"
-/'#include "gsp.bi"
-#include "matrix.bi"
-#include "f3dex2.bi"
+#include "gsp.bi"
+
 #include "combine.bi"
+
+ #include "matrix.bi"
+/'#include "f3dex2.bi"
+
 #include "crc.bi" '/
 
 #ifndef max

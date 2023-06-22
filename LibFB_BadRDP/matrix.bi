@@ -1,4 +1,5 @@
-declare sub RDP_Matrix_MulMatrices(as single ptr Src1,as single ptr  Src2,as single ptr Target)
-declare sub RDP_Matrix_ModelviewMul(Mat As Single Ptr)
-declare sub RDP_Matrix_ModelviewPop(as integer)
-declare Sub RDP_Matrix_ProjectionLoad(Mat As Single Ptr)
+Declare Sub RDP_Matrix_MulMatrices(ByVal Src1 As Single Ptr, ByVal Src2 As Single Ptr, ByVal Target As Single Ptr)
+Declare Sub RDP_Matrix_ModelviewMul(ByVal Mat As Single Ptr)
+Declare Sub RDP_Matrix_ModelviewPop(ByVal Mat As Integer)
+'Declare Sub RDP_Matrix_ProjectionLoad(ByVal Mat As Single Ptr)
+

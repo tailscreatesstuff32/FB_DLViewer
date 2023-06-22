@@ -38,23 +38,23 @@ end type
 extern as __RDRAM RDRAM
 
 Declare Sub RDP_SetupOpenGL()
-Declare Sub RDP_SetOpenGLDimensions(_Width As Integer, _Height As Integer)
-Declare Sub RDP_InitParser(UcodeID As Integer)
-Declare Sub RDP_LoadToSegment(Segment As UByte, Buffer As UByte Ptr, Offset As Integer, Size As Integer)
-Declare Sub RDP_LoadToRDRAM(Buffer As UByte Ptr, Size As Integer)
+Declare Sub RDP_SetOpenGLDimensions(_Width As integer, _Height As integer)
+Declare Sub RDP_InitParser(UcodeID As integer)
+Declare Sub RDP_LoadToSegment(Segment As UByte, Buffer As UByte Ptr, Offset As integer, Size As integer)
+Declare Sub RDP_LoadToRDRAM(Buffer As UByte Ptr, Size As integer)
 Declare Function RDP_SaveSegment(Segment As UByte, Buffer As UByte Ptr) As Boolean
-Declare Sub RDP_Yaz0Decode(_Input As UByte Ptr, _Output As UByte Ptr, DecSize As Integer)
-Declare Sub RDP_MIO0Decode(_Input As UByte Ptr, _Output As UByte Ptr, DecSize As Integer)
-Declare Function RDP_CheckAddressValidity(Address As Integer) As Boolean
-Declare Function RDP_GetPhysicalAddress(VAddress As Integer) As Integer
+Declare Sub RDP_Yaz0Decode(_Input As UByte Ptr, _Output As UByte Ptr, DecSize As integer)
+Declare Sub RDP_MIO0Decode(_Input As UByte Ptr, _Output As UByte Ptr, DecSize As integer)
+Declare Function RDP_CheckAddressValidity(Address As integer) As Boolean
+Declare Function RDP_GetPhysicalAddress(VAddress As integer) As integer
 Declare Sub RDP_ClearSegment(Segment As UByte)
 Declare Sub RDP_ClearRDRAM()
 Declare Sub RDP_ClearTextures()
 Declare Sub RDP_ClearStructures(Full As Boolean)
-Declare Sub RDP_ParseDisplayList(Address As Integer, ResetStack As Boolean)
-Declare Sub RDP_CreateCombinerProgram(Cmb0 As Integer, Cmb1 As Integer)
-Declare Sub RDP_Dump_InitModelDumping(Path As ZString Ptr, ObjFilename As ZString Ptr, MtlFilename As ZString Ptr)
-Declare Sub RDP_Dump_StopModelDumping()
+Declare Sub RDP_ParseDisplayList(Address As integer, ResetStack As Boolean)
+Declare Sub RDP_CreateCombinerProgram(Cmb0 As integer, Cmb1 As integer)
+'Declare Sub RDP_Dump_InitModelDumping(Path As ZString Ptr, ObjFilename As ZString Ptr, MtlFilename As ZString Ptr)
+'Declare Sub RDP_Dump_StopModelDumping()
 Declare Function RDP_OpenGL_ExtFragmentProgram() As Boolean
 Declare Sub RDP_SetRendererOptions(Options As UByte)
 Declare Function RDP_GetRendererOptions() As UByte
