@@ -4,7 +4,8 @@ TARGET = $(PROJECT).a
 
 
 # Environment
-FB = fbc
+#FB = fbc32 -Wc -Wno-builtin-declaration-mismatch,-Wno-memset-elt-size -gen gcc
+fbc32 -Wc -w -w none  -gen gcc
 # AR = ar  
 
 # Utils flags
